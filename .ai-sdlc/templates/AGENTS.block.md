@@ -9,6 +9,3 @@
 - Required Checks、Review 與 Merge 條件全部成立後，才能依目前模式 Merge。
 - 永遠優先遵守本 Repository 更具體的技術、測試、安全與交付規範。
 <!-- ai-sdlc-framework:end -->
-## 專案協作規則
-
-- 每項工作開始前，完整讀取 [`PROJECT_RULES.md`](PROJECT_RULES.md) 並遵守其中規則。
