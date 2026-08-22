@@ -46,6 +46,46 @@ test("check-install accepts the exact LF installation and rejects CRLF drift", a
   assert.match(rejected.stderr, /(?:CRLF|EOL|integrity|install|checksum)/i);
 });
 
+test("check-install accepts a detached CI checkout through the canonical origin default branch", async (t) => {
+  const fixture = await createRepository({ remote: true });
+  t.after(() => fixture.cleanup());
+  await initialiseProject(fixture, "NEW_CODEBASE");
+
+  const detachedHead = git(fixture.repository, ["rev-parse", "HEAD"]).stdout.trim();
+  git(fixture.repository, ["switch", "--detach", detachedHead]);
+  git(fixture.repository, ["branch", "-D", "main"]);
+
+  assert.notEqual(git(fixture.repository, ["show-ref", "--verify", "refs/heads/main"], { allowFailure: true }).status, 0);
+  assert.equal(git(fixture.repository, ["show-ref", "--verify", "refs/remotes/origin/main"]).status, 0);
+  runCli(fixture.repository, ["check-install"]);
+
+  const requestPath = path.join(fixture.fixtureRoot, "detached-request.md");
+  await writeFile(requestPath, "# Request\n\nDetached CI must stay read-only.\n", "utf8");
+  const rejectedMutation = runCli(fixture.repository, [
+    "start",
+    "--work-id",
+    "detached-mutation",
+    "--request",
+    requestPath,
+    "--kind",
+    "FRAMEWORK",
+  ], { expectFailure: true });
+  assert.match(rejectedMutation.stderr, /INVALID_DEFAULT_BRANCH|DETACHED_HEAD/);
+});
+
+test("check-install rejects a detached checkout without local or origin default branches", async (t) => {
+  const fixture = await createRepository();
+  t.after(() => fixture.cleanup());
+  await initialiseProject(fixture, "NEW_CODEBASE");
+
+  const detachedHead = git(fixture.repository, ["rev-parse", "HEAD"]).stdout.trim();
+  git(fixture.repository, ["switch", "--detach", detachedHead]);
+  git(fixture.repository, ["branch", "-D", "main"]);
+
+  const rejected = runCli(fixture.repository, ["check-install"], { expectFailure: true });
+  assert.match(rejected.stderr, /MISSING_DEFAULT_BRANCH/);
+});
+
 test("check-install rejects an installation lock or project fact for another Framework", async (t) => {
   const fixture = await createRepository();
   t.after(() => fixture.cleanup());

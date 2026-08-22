@@ -167,8 +167,9 @@ async function readProject(root) {
   await assertNoSymlinkPath(root, `${RUNTIME_DIR}/project.json`);
   const project = validateProject(await readJson(resolveInside(root, `${RUNTIME_DIR}/project.json`)));
   assert(git(root, ["check-ref-format", "--branch", project.defaultBranch], { allowFailure: true }).exitCode === 0, "INVALID_DEFAULT_BRANCH", "Project defaultBranch is not a safe Git branch name.");
-  const defaultHead = refSha(root, `refs/heads/${project.defaultBranch}`);
-  assert(defaultHead !== null, "MISSING_DEFAULT_BRANCH", "Project defaultBranch does not exist locally.");
+  const defaultHead = refSha(root, `refs/heads/${project.defaultBranch}`)
+    ?? refSha(root, `refs/remotes/origin/${project.defaultBranch}`);
+  assert(defaultHead !== null, "MISSING_DEFAULT_BRANCH", "Project defaultBranch does not exist locally or as an origin remote-tracking branch.");
   assert(project.setup.baselineCommit === null || isAncestor(root, project.setup.baselineCommit, defaultHead), "INVALID_PROJECT_BASELINE", "Project setup baseline is not in the default branch history.");
   return project;
 }
