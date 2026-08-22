@@ -161,8 +161,20 @@ Review 過程中實際修正的重點包括：
 - 本機 evidence 的防護對象是錯誤順序、遺漏與過期，不是已取得任意 Repository 寫入權的惡意程式。
 - GitHub merge 的 Head CAS 不能等同 base CAS；Adapter 以 merge 前即時重查縮小風險，但不宣稱消除平台限制。
 
-## 九、交付判準
+## 九、Repository／PR／Merge 結果
 
-本分支只有在工作樹乾淨、Frozen Spec 未變、完整 verification 與兩份 Review 都綁定最新 Head 時才可 Publish。
-Push 對此任務是自然的遠端交付手段，不額外觸發或等待非 Required CI；PR 與 Merge 的實際結果由
-GitHub 即時事實決定，並在本次自主執行的最終回覆中列出。
+本分支已符合本機 Publish 判準：工作樹乾淨、Frozen Spec 未變、完整 verification 與兩份 Review
+均通過。遠端交付則遇到文件定義的 credential／integration 硬阻塞：
+
+| 項目 | 實際結果 |
+| --- | --- |
+| Repository | `https://github.com/kof1016/ai-work-flow-demo` |
+| HTTPS Push | FAILED：`fatal: could not read Username for 'https://github.com': No such device or address` |
+| GitHub 連接器身分／讀取 | PASS：`kof1016`；Repository metadata 回報 `admin: true`、`push: true` |
+| GitHub 連接器寫入 | FAILED：Git data API 回 `403 Resource not accessible by integration` |
+| PR | NOT_CREATED：遠端 feature branch 無法建立 |
+| CI／Required Checks | NOT_RUN：沒有 PR；也沒有為非 Required CI 額外等待 |
+| Merge | NOT_PERFORMED：沒有可合併的 PR |
+
+因此沒有建立空分支、假 evidence 或繞過 GitHub 權限。解除阻塞需要可對此 Repository 寫入 Git objects
+的 credential／GitHub App installation permission；在目前執行權限內無法由程式安全修復。
