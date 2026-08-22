@@ -5,6 +5,7 @@
 - 使用者提供的《AI-SDLC Framework v2.1 自主重構交接指令》是本需求的完整需求與自主執行授權。
 - 使用者後續明確更正：GitHub Repository 的現行設定與歷史修正才是本次重構基準；舊 ZIP 不作為實作來源。
 - 使用者要求保留精簡方向：不得為了 fail-closed 引入龐大狀態機、Workflow DSL 或不必要術語；下一步應由已保存的客觀事實直接推導。
+- 使用者後續授權：若符合自然流程可 Push，但本次交付不必把 CI 當成必要步驟；若平台實際設定 Required Checks，仍不得繞過平台限制。
 - 基準為 `kof1016/ai-work-flow-demo` 的 `main` commit `06bab4bd26e2f48fa02dad16a29a216086244bbc`。
 - 本文件完成 Spec Review 後，以 Spec-only 本機 commit 凍結；該 commit 是實作與 Review 的唯一規格基準。
 
@@ -34,7 +35,7 @@
 - [ ] 現有 A+B Demo 的產品行為與測試維持；歷史文件矛盾、缺漏的 formatting／coverage／CI 檢查與數值契約歧義須被明確處理或記錄。
 - [ ] 建立可重跑的 automated checker、contract tests、CLI tests、package tests 與 clean-room drills。
 - [ ] Clean-room 覆蓋 NEW、ADOPT、需求 shape、Spec-only freeze、三種模式、TDD、完整 verification、兩種 Review、publish、Spec change-control、失敗恢復、Head invalidation、Framework update、LF／CRLF 與新 Session Router 恢復。
-- [ ] 本機完整驗證、Implementation Review、Test／Workflow Review 和 GitHub CI 均通過後，使用同一 feature branch 與單一 PR 完成交付；不得繞過失敗檢查或修改 Repository Settings。
+- [ ] 本機完整驗證、Implementation Review 與 Test／Workflow Review 均通過後，使用同一 feature branch 與單一 PR 完成交付；Push 可作自然備份點，不為形式主動要求 CI，且不得繞過實際 Required Checks 或修改 Repository Settings。
 
 ## 架構邊界
 
@@ -77,6 +78,6 @@
 ## 交付
 
 - Feature branch：`refactor/framework-skill-architecture`。
-- 一個 Draft PR，後續所有 Review／CI 修正留在同一分支與 PR。
-- Reviews 與 Required Checks 對最新 Head 全部成立後轉 Ready 並 Merge。
+- 一個 Draft PR；若平台自動啟動 CI，只記錄實際結果，不把非 Required CI 當成本任務的人為前置條件。
+- Reviews 與實際 Required Checks（若有）對最新 Head 成立後轉 Ready 並 Merge。
 - 正式報告：`docs/AI-SDLC-Framework-v2.1-refactor-report.md`。
