@@ -19,6 +19,7 @@
 - [ ] 不保存一串人工流程狀態；`inspect` 直接根據 Project、Spec freeze、mode、目前 Git Head、verification、兩份 Review 與 delivery facts 推導唯一下一步。
 - [ ] 對使用者只呈現設定、規格、實作、Review、交付五個白話階段；內部沒有通用 Workflow DSL。
 - [ ] 使用者確認只是一筆綁定目前 Spec hash 的事實；Spec-only 本機 commit 與內容 hash 驗證成功後才成立 freeze。
+- [ ] Freeze 與模式資料可在 feature branch 以 commit 保存並選擇性 Push，便於備份與跨 Session 接續；此時不開 PR、不要求遠端 CI，也不視為 Publish。
 - [ ] Frozen Spec 在實作期間為唯讀；內容改變或不可行時，`inspect` 只回傳 `spec-change-needed`，清除下游證據並重新確認及 Freeze。
 - [ ] 模式在 Freeze 後保存為結構化資料；監督、委派與全自動只改變需要停下取得授權的動作，不改變驗證、Review、CI 或 Merge 標準。
 - [ ] Git SHA、Spec hash、verification、review freshness、publish preflight 與 delivery receipts 由固定程式及 contract 驗證；缺少事實或順序不合法時一律拒絕前進。
