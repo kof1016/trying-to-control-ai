@@ -4,6 +4,7 @@
 
 - 使用者提供的《AI-SDLC Framework v2.1 自主重構交接指令》是本需求的完整需求與自主執行授權。
 - 使用者後續明確更正：GitHub Repository 的現行設定與歷史修正才是本次重構基準；舊 ZIP 不作為實作來源。
+- 使用者要求保留精簡方向：不得為了 fail-closed 引入龐大狀態機、Workflow DSL 或不必要術語；下一步應由已保存的客觀事實直接推導。
 - 基準為 `kof1016/ai-work-flow-demo` 的 `main` commit `06bab4bd26e2f48fa02dad16a29a216086244bbc`。
 - 本文件完成 Spec Review 後，以 Spec-only 本機 commit 凍結；該 commit 是實作與 Review 的唯一規格基準。
 
@@ -13,18 +14,19 @@
 
 ## 可驗收條件
 
-- [ ] 根 `AGENTS.md` 只作為精簡 Router：讀取狀態、找出下一個合法工作、載入必要 Skill 或執行固定 Gate。
+- [ ] 根 `AGENTS.md` 只作為精簡 Router：執行 `inspect`、採用唯一合法的下一步、載入必要 Skill 或執行固定 Gate。
 - [ ] Framework 靜態 Kernel、contracts、templates、scripts 與 adapters 和 `.ai-sdlc/` Runtime Data 分離。
-- [ ] Lifecycle 至少區分 Foundation 與 Point；Point 的正常順序為 `SHAPING → DRAFT → FROZEN → POLICY_SET → EXECUTING → VERIFYING → REVIEWING → REVIEWED → PUBLISH_READY → PUBLISHED → MERGED`。
-- [ ] `Confirmed` 是使用者確認目前 Spec 內容的事件與 Freeze guard，不是長期狀態；`FROZEN` 只在 Spec-only 本機 commit 與內容 hash 驗證成功後成立。
-- [ ] Frozen Spec 在執行階段為唯讀；內容改變或不可行時回傳 `SPEC_CHANGE_REQUIRED`，清除下游證據並重新 shape、確認及 Freeze。
-- [ ] Execution Policy 在 Freeze 後保存為結構化資料；監督、委派與全自動模式只改變 Approval Gate 的暫停點，不改變 Lifecycle、驗證、Review、CI 或 Merge 標準。
-- [ ] Git SHA、Spec hash、狀態轉換、verification evidence、review freshness、publish preflight 與 delivery receipts 由固定程式及 contract 驗證；非法或缺證狀態一律拒絕前進。
+- [ ] 不保存一串人工流程狀態；`inspect` 直接根據 Project、Spec freeze、mode、目前 Git Head、verification、兩份 Review 與 delivery facts 推導唯一下一步。
+- [ ] 對使用者只呈現設定、規格、實作、Review、交付五個白話階段；內部沒有通用 Workflow DSL。
+- [ ] 使用者確認只是一筆綁定目前 Spec hash 的事實；Spec-only 本機 commit 與內容 hash 驗證成功後才成立 freeze。
+- [ ] Frozen Spec 在實作期間為唯讀；內容改變或不可行時，`inspect` 只回傳 `spec-change-needed`，清除下游證據並重新確認及 Freeze。
+- [ ] 模式在 Freeze 後保存為結構化資料；監督、委派與全自動只改變需要停下取得授權的動作，不改變驗證、Review、CI 或 Merge 標準。
+- [ ] Git SHA、Spec hash、verification、review freshness、publish preflight 與 delivery receipts 由固定程式及 contract 驗證；缺少事實或順序不合法時一律拒絕前進。
 - [ ] Feature Head SHA、Frozen Spec 或基準改變後，舊 verification、reviews 與 publish evidence 自動失效。
 - [ ] Implementation Review 與 Test／Workflow Review 分開產生 verdict，兩者均須綁定同一最新 Head 與 Frozen Spec。
 - [ ] Local 與 GitHub 平台差異由 Adapter 處理；Push、PR、CI、Merge、單一 Git 指令或模式選擇不拆成 Skill。
-- [ ] 第一方 Skill 只在具備獨立觸發、AI 判斷與可驗收輸出時成立；初步候選為 Foundation、Shape Point、Execute Point、Review Change，最終數量須通過重疊、上下文與副作用邊界 Review，不以四個為硬性目標。
-- [ ] Matt `grilling`、`tdd`、`codebase-design` 保持固定上游版本及原責任，不修改或 Fork；Framework 自行補足正式 Spec、Freeze、Lifecycle、Review、Evidence 與 Delivery。
+- [ ] 第一方 Skill 只在具備獨立觸發、AI 判斷與可驗收輸出時成立；候選為 `setup-project`、`define-requirement`、`implement-change`、`review-change`，最終仍須通過重疊、上下文與副作用邊界 Review，不以四個為硬性目標。
+- [ ] Matt `grilling`、`tdd`、`codebase-design` 保持固定上游版本及原責任，不修改或 Fork；Framework 自行補足正式 Spec、Freeze、Review、Evidence 與 Delivery。
 - [ ] Bootstrap 不依賴尚未安裝的 Skill，能從發行內容安裝／更新第一方 Skills、靜態 runtime、Router block 與版本 lock，且不覆寫非 Framework 管理內容。
 - [ ] 第三方 Skills 有可驗證的來源 lock、安裝方式與授權聲明。
 - [ ] Framework 可產生明確邊界的發行包，不包含 Demo 產品程式、Runtime State 或歷史交付證據。
@@ -37,7 +39,7 @@
 
 ### AI 判斷
 
-- 判斷 NEW／ADOPT 的專案脈絡與必要 Foundation 工作。
+- 判斷 NEW／ADOPT 的專案脈絡與必要設定。
 - 需求決策前沿、正式 Spec 整理與可測性 Review。
 - 依 Frozen Spec 進行 TDD、設計與實作。
 - Implementation 與 Test／Workflow 的語意 Review。
@@ -45,7 +47,7 @@
 ### 固定控制
 
 - Contract 與 schema 驗證。
-- Lifecycle guard 與狀態轉換。
+- 根據已保存事實推導下一個合法動作。
 - Spec confirmation hash、Freeze commit ancestry 與唯讀檢查。
 - Verification command 執行與 evidence envelope。
 - Head／base SHA freshness、Review verdict 與 publish preflight。
@@ -53,7 +55,7 @@
 
 ### Runtime Data
 
-`.ai-sdlc/` 保存 Project Foundation、Toolchain、Requests、Specs、Points、Execution Policy、Reviews、Evidence、Delivery receipts 與 Migration 記錄，不保存大型 Agent 操作說明。
+`.ai-sdlc/` 保存 Project、Toolchain、Work（request、Spec、freeze、mode）、Reviews、Evidence、Delivery receipts 與 Migration 記錄，不保存大型 Agent 操作說明或流程引擎。
 
 ## 非目標
 
@@ -65,7 +67,7 @@
 
 ## 驗證方式
 
-- Node built-in tests 驗證 CLI、contracts、state guards、Git ancestry、freshness 與安裝／更新。
+- Node built-in tests 驗證 CLI、contracts、事實推導、Git ancestry、freshness 與安裝／更新。
 - 真實暫存 Git repositories 執行 NEW、ADOPT、Freeze、change-control、三種 policy、Review、Publish 與恢復 drills。
 - Maven Wrapper `verify` 驗證 Demo 產品及 formatting、lint、test、build、coverage。
 - 發行包解壓後以全新工作目錄執行 manifest 與 clean-room 驗證。
