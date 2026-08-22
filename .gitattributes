@@ -1,15 +1,1 @@
 * text=auto eol=lf
-
-*.java text eol=lf
-*.md text eol=lf
-*.properties text eol=lf
-*.xml text eol=lf
-*.yaml text eol=lf
-*.yml text eol=lf
-
-.agents/skills/review-implementation/agents/openai.yaml whitespace=-blank-at-eof
-.agents/skills/write-spec/agents/openai.yaml whitespace=-blank-at-eof
-.agents/skills/write-spec/assets/spec-template.md whitespace=-blank-at-eof
-.github/workflows/spring-boot.yml whitespace=-blank-at-eof
-AGENTS.md whitespace=-blank-at-eof
-examples/spring-boot/AGENTS.md whitespace=-blank-at-eof
