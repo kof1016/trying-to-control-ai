@@ -1,0 +1,4 @@
+interface:
+  display_name: "定義並確認需求"
+  short_description: "將需求整理成由人確認、可測試且可凍結的正式 Spec"
+  default_prompt: "使用 $define-requirement 將這項需求整理成正式 Spec，並依 inspect 指示完成確認與本機 freeze。"

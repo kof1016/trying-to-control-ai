@@ -1,13 +1,8 @@
 ---
-description: Test-driven development. Use when the user wants to build features or fix bugs test-first, mentions "red-green-refactor", or wants integration tests.
-metadata:
-    github-path: skills/engineering/tdd
-    github-pinned: v1.2.3
-    github-ref: refs/tags/v1.2.3
-    github-repo: https://github.com/mattpocock/skills
-    github-tree-sha: 423f3cc2bccf3b0ed426fb35eeb4b38d9188a343
 name: tdd
+description: Test-driven development. Use when the user wants to build features or fix bugs test-first, mentions "red-green-refactor", or wants integration tests.
 ---
+
 # Test-Driven Development
 
 TDD is the red → green loop. This skill is the reference that makes that loop produce tests worth keeping: what a good test is, where tests go, the anti-patterns, and the rules of the loop. Every section applies on every cycle — consult them before and during the loop, not after.

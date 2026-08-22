@@ -1,1 +1,8 @@
 * text=auto eol=lf
+
+# ai-sdlc-framework:begin
+.ai-sdlc/**/*.md text eol=lf
+.ai-sdlc/**/*.json text eol=lf
+.ai-sdlc-framework/** text eol=lf
+.agents/skills/** text eol=lf
+# ai-sdlc-framework:end

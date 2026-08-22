@@ -1,0 +1,4 @@
+interface:
+  display_name: "設定開發專案"
+  short_description: "建立或接手可開發、可測試且可重現的專案基線"
+  default_prompt: "使用 $setup-project 檢查此 repository，完成可重現的開發與驗證設定。"
