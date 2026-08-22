@@ -28,6 +28,19 @@ function runInstaller(target) {
   ], { cwd: sourceRoot, encoding: "utf8" });
 }
 
+async function symlinkOrSkipWithoutWindowsPrivilege(t, target, linkPath, type = undefined) {
+  try {
+    await symlink(target, linkPath, type);
+    return true;
+  } catch (error) {
+    if (process.platform === "win32" && error?.code === "EPERM") {
+      t.skip("Windows process lacks permission to create symbolic links");
+      return false;
+    }
+    throw error;
+  }
+}
+
 test("check-install accepts the exact LF installation and rejects CRLF drift", async (t) => {
   const fixture = await createRepository();
   t.after(() => fixture.cleanup());
@@ -247,7 +260,7 @@ test("installer rejects a managed target path through a symlink and leaves the o
   await mkdir(target);
   await mkdir(outside);
   await writeFile(path.join(outside, "sentinel.txt"), "preserve\n", "utf8");
-  await symlink(outside, path.join(target, ".agents"), "dir");
+  if (!(await symlinkOrSkipWithoutWindowsPrivilege(t, outside, path.join(target, ".agents"), "dir"))) return;
 
   const result = runInstaller(target);
   assert.notEqual(result.status, 0);
@@ -265,7 +278,7 @@ test("CLI rejects a project authority file replaced by a symlink", async (t) => 
   const outside = path.join(fixture.fixtureRoot, "outside-project.json");
   await writeFile(outside, await readFile(projectPath));
   await rm(projectPath);
-  await symlink(outside, projectPath);
+  if (!(await symlinkOrSkipWithoutWindowsPrivilege(t, outside, projectPath))) return;
 
   const rejected = runCli(fixture.repository, ["inspect"], { expectFailure: true });
   assert.match(rejected.stderr, /SYMLINK_PATH/);
@@ -296,7 +309,7 @@ test("exact commits reject an unrelated staged type change", async (t) => {
   await writeFile(victimPath, "tracked file\n", "utf8");
   commitAll(fixture.repository, "test: add type-change victim");
   await rm(victimPath);
-  await symlink("AGENTS.md", victimPath);
+  if (!(await symlinkOrSkipWithoutWindowsPrivilege(t, "AGENTS.md", victimPath))) return;
   git(fixture.repository, ["add", "--", "victim.txt"]);
   await writeFile(path.join(fixture.repository, "allowed.txt"), "allowed\n", "utf8");
 
