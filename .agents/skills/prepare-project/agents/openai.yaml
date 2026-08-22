@@ -1,0 +1,4 @@
+interface:
+  display_name: "準備專案"
+  short_description: "在空白專案或缺少基線時建立最小且可重現的建置與測試工具鏈"
+  default_prompt: "使用 $prepare-project 為目前任務建立最小且可重現的建置與測試基線。"

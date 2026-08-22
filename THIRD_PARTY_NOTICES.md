@@ -1,14 +1,12 @@
 # Third-party notices
 
-AI-SDLC Framework 可依 `.ai-sdlc-framework/locks/matt-skills.lock.json` 安裝以下外部 Skills：
+本 Repository 保留以下第三方 Skills：
 
 - `grilling`
 - `tdd`
 - `codebase-design`
 
 來源：[mattpocock/skills](https://github.com/mattpocock/skills)，tag `v1.2.3`，commit `6acc160e4e0cd062dbbbd7a1b26ae92855edf07e`。
-
-這些檔案不屬於 AI-SDLC Framework 第一方發行內容；安裝器從上游固定 commit 取得並驗證每個檔案的 SHA-256。
 
 ## MIT License
 

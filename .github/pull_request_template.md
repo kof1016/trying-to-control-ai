@@ -1,31 +1,33 @@
-## Work 與 Spec
+## 為什麼
 
-- Work：`<work-id>`
-- Frozen Spec commit：`<sha>`
-- Spec SHA-256：`<sha256>`
-- Mode：`<supervised|delegated|autonomous>`
+<!-- 用 1–3 句說明要解決的問題，以及為什麼採用目前形狀。 -->
+
+## 規格
+
+- 來源（可多筆）：
+  - `<specs/<slug>.md，或已確認的 task handoff>`
 
 ## 變更
 
-- <摘要>
+- <!-- 實際改了什麼；依責任分組，不逐檔抄 diff。 -->
 
-## 本機證據
+## 驗證
 
-- Verified head：`<sha>`
-- Verification：<實際命令與結果>
-- Implementation Review：<PASS/BLOCKED 與 findings>
-- Test Review：<PASS/BLOCKED 與 findings>
+- [ ] `<實際本機命令>` — `<PASS／FAIL>`
+- CI：`<not triggered／not required／passed／failed>` <!-- 有結果時附連結。 -->
 
-## GitHub 即時結果
+## Review
 
-- Configured checks：<名稱與結果>
-- Required checks：<名稱與結果；未設定時寫 `none`>
-- Unresolved review threads：<數量>
-- Conflicts／mergeability：<結果>
+### Implementation Review
 
-## Merge gate
+- 結果：`<PASS／FAIL>`
+- Findings 與修正：`<None，或 finding 與修正摘要>`
 
-- [ ] PR Head 等於最新 verified Head。
-- [ ] 最新 Head 有 append-only AI-SDLC evidence comment。
-- [ ] 實際 Required Checks 已完成且成功（若未設定則明確記錄）。
-- [ ] PR 已轉 Ready，且沒有 outstanding changes request、未解決 blocking thread 或 conflict。
+### Test Review
+
+- 結果：`<PASS／FAIL>`
+- Findings 與修正：`<None，或 finding 與修正摘要>`
+
+## 範圍
+
+- 刻意不變更：`<本次明確未處理的內容>`
