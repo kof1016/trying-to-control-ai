@@ -22,11 +22,11 @@
 - [ ] 使用者確認只是一筆綁定目前 Spec hash 的事實；Spec-only 本機 commit 與內容 hash 驗證成功後才成立 freeze。
 - [ ] Freeze 與模式資料可在 feature branch 以 commit 保存並選擇性 Push，便於備份與跨 Session 接續；此時不開 PR、不要求遠端 CI，也不視為 Publish。
 - [ ] Frozen Spec 在實作期間為唯讀；內容改變或不可行時，`inspect` 只回傳 `spec-change-needed`，清除下游證據並重新確認及 Freeze。
-- [ ] 模式在 Freeze 後保存為結構化資料；監督、委派與全自動只改變需要停下取得授權的動作，不改變驗證、Review、CI 或 Merge 標準。
-- [ ] Git SHA、Spec hash、verification、review freshness、publish preflight 與 delivery receipts 由固定程式及 contract 驗證；缺少事實或順序不合法時一律拒絕前進。
+- [ ] 模式在 Freeze 後保存為結構化資料；supervised 在 Publish／Merge 前、delegated 在 Merge 前需要明確授權，autonomous 才可在 gates 成立後直接交付；模式不改變本機驗證、Review 或平台實際 Required Checks／Merge 標準，非 Required CI 不作人為 gate。
+- [ ] Git SHA、Spec hash、verification、review freshness、publish preflight 與即時 delivery facts 由固定程式及 contract 驗證；缺少事實或順序不合法時一律拒絕前進。
 - [ ] Feature Head SHA、Frozen Spec 或基準改變後，舊 verification、reviews 與 publish evidence 自動失效。
 - [ ] Implementation Review 與 Test／Workflow Review 分開產生 verdict，兩者均須綁定同一最新 Head 與 Frozen Spec。
-- [ ] Local 與 GitHub 平台差異由 Adapter 處理；Push、PR、CI、Merge、單一 Git 指令或模式選擇不拆成 Skill。
+- [ ] Local 與 GitHub 平台差異由受信任 Adapter 處理；它綁定 canonical origin，固定 Draft→exact evidence→Ready 順序，Merge 前即時重查 base／Head／Required status checks／review facts，無法機械證明的 ruleset fail closed；Push、PR、CI、Merge、單一 Git 指令或模式選擇不拆成 Skill。
 - [ ] 第一方 Skill 只在具備獨立觸發、AI 判斷與可驗收輸出時成立；候選為 `setup-project`、`define-requirement`、`implement-change`、`review-change`，最終仍須通過重疊、上下文與副作用邊界 Review，不以四個為硬性目標。
 - [ ] Matt `grilling`、`tdd`、`codebase-design` 保持固定上游版本及原責任，不修改或 Fork；Framework 自行補足正式 Spec、Freeze、Review、Evidence 與 Delivery。
 - [ ] Bootstrap 不依賴尚未安裝的 Skill，能從發行內容安裝／更新第一方 Skills、靜態 runtime、Router block 與版本 lock，且不覆寫非 Framework 管理內容。
@@ -53,11 +53,11 @@
 - Spec confirmation hash、Freeze commit ancestry 與唯讀檢查。
 - Verification command 執行與 evidence envelope。
 - Head／base SHA freshness、Review verdict 與 publish preflight。
-- 安裝 manifest、版本 lock、發行包內容與 Adapter receipt 驗證。
+- 安裝 manifest、版本 lock、發行包內容與 Adapter 即時回應驗證。
 
 ### Runtime Data
 
-`.ai-sdlc/` 保存 Project、Toolchain、Work（request、Spec、freeze、mode）、Reviews、Evidence、Delivery receipts 與 Migration 記錄，不保存大型 Agent 操作說明或流程引擎。
+`.ai-sdlc/` 保存 Project、Toolchain、Work（request、Spec、freeze、mode）、Reviews、Evidence 與 Migration 記錄；GitHub delivery facts 每次即時查詢，不保存 receipt，也不保存大型 Agent 操作說明或流程引擎。
 
 ## 非目標
 
@@ -66,6 +66,7 @@
 - 不為了此次重構更換 Java／Spring／Maven 技術棧或擴張 A+B 產品功能。
 - 不修改 Branch Protection、Required Checks、Secrets 或其他 Repository Settings。
 - 不以增加檔案或 Skill 數量作為成功標準。
+- 不對具有任意 Repository 寫入權的惡意本機行程提供密碼學 attestation，也不宣稱 GitHub 僅接受 Head CAS 的 REST merge 具備 base SHA 原子鎖；這些信任與平台限制必須明文記錄。
 
 ## 驗證方式
 
