@@ -4,8 +4,7 @@
 
 ## 規格
 
-- 來源（可多筆）：
-  - `<specs/<slug>.md，或已確認的 task handoff>`
+- `<specs/<slug>.md，或明確 task>`
 
 ## 變更
 
@@ -18,15 +17,8 @@
 
 ## Review
 
-### Implementation Review
-
-- 結果：`<PASS／FAIL>`
-- Findings 與修正：`<None，或 finding 與修正摘要>`
-
-### Test Review
-
-- 結果：`<PASS／FAIL>`
-- Findings 與修正：`<None，或 finding 與修正摘要>`
+- Implementation：`<PASS／FAIL>`；Findings／修正：`<None 或摘要>`
+- Test：`<PASS／FAIL>`；Findings／修正：`<None 或摘要>`
 
 ## 範圍
 

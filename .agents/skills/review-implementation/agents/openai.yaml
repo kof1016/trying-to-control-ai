@@ -2,4 +2,3 @@ interface:
   display_name: "審查實作"
   short_description: "從實作與測試兩個獨立視角審查變更並提出 findings"
   default_prompt: "使用 $review-implementation 從實作與測試兩個視角審查目前變更。"
-

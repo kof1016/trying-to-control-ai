@@ -1,4 +1,4 @@
 interface:
   display_name: "依規格實作"
   short_description: "依 Spec 使用設計準則與 TDD 完成最小實作及驗證"
-  default_prompt: "使用 $implement-spec 依已完成且足以實作的 Spec 以 TDD 完成實作與本機驗證。"
+  default_prompt: "使用 $implement-spec 依已確認且可實作的 Spec，以 TDD 完成實作與驗證。"
