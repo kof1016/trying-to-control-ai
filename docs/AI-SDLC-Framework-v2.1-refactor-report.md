@@ -164,17 +164,26 @@ Review 過程中實際修正的重點包括：
 ## 九、Repository／PR／Merge 結果
 
 本分支已符合本機 Publish 判準：工作樹乾淨、Frozen Spec 未變、完整 verification 與兩份 Review
-均通過。遠端交付則遇到文件定義的 credential／integration 硬阻塞：
+均通過。先前 Work 網頁環境的 Git HTTPS Push 因無可用 credential 而失敗，GitHub App 寫入 Git data
+API 也因 integration 權限不足回覆 `403 Resource not accessible by integration`；這兩項失敗是當時
+執行環境的真實紀錄，不代表 Repository owner 無寫入權。
+
+Repository owner 後續已使用完整 Git bundle 成功 Push，同一 feature branch 已建立於 canonical origin，
+並精確指向 `567c21664159ff5012e384162684055f12d6e8d5`。本次後續交付改由已登入的 GitHub CLI
+以 owner 身分執行；PR 與 Merge 不再沿用先前的 `NOT_CREATED`／`NOT_PERFORMED` 結論，而以本次執行
+產生的 GitHub 即時 terminal facts 為準。
 
 | 項目 | 實際結果 |
 | --- | --- |
 | Repository | `https://github.com/kof1016/ai-work-flow-demo` |
-| HTTPS Push | FAILED：`fatal: could not read Username for 'https://github.com': No such device or address` |
-| GitHub 連接器身分／讀取 | PASS：`kof1016`；Repository metadata 回報 `admin: true`、`push: true` |
-| GitHub 連接器寫入 | FAILED：Git data API 回 `403 Resource not accessible by integration` |
-| PR | NOT_CREATED：遠端 feature branch 無法建立 |
-| CI／Required Checks | NOT_RUN：沒有 PR；也沒有為非 Required CI 額外等待 |
-| Merge | NOT_PERFORMED：沒有可合併的 PR |
+| Work 環境 Git HTTPS Push | FAILED：`fatal: could not read Username for 'https://github.com': No such device or address` |
+| Work 環境 GitHub App 寫入 | FAILED：Git data API 回 `403 Resource not accessible by integration` |
+| Owner-assisted Push | PASS：完整 Git bundle 已成功 Push |
+| 遠端 feature branch | PASS：`origin/refactor/framework-skill-architecture` 已建立，初始交接 Head 為 `567c21664159ff5012e384162684055f12d6e8d5` |
+| 後續執行身分 | PASS：GitHub CLI 已登入 `kof1016`，Repository 權限為 `ADMIN` |
+| PR | 本次後續執行建立唯一 Draft PR；最終狀態以 GitHub 即時 PR facts 為準 |
+| CI／Required Checks | 本次後續執行即時查證；只遵守 GitHub 實際 Required Checks，非 Required CI 不另設門檻 |
+| Merge | 本次後續執行在 base、Head、mergeability、review threads、Branch Protection、rulesets 與實際 Required Checks 均符合後執行；最終 SHA 以 GitHub terminal facts 為準 |
 
-因此沒有建立空分支、假 evidence 或繞過 GitHub 權限。解除阻塞需要可對此 Repository 寫入 Git objects
-的 credential／GitHub App installation permission；在目前執行權限內無法由程式安全修復。
+因此先前的硬阻塞已由 Repository owner 提供的可寫入交付路徑解除；本次執行仍不建立假 evidence、
+不修改 Repository Settings，也不繞過 GitHub 實際 Required Gates。
