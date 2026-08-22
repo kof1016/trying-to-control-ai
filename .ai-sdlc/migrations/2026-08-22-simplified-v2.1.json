@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "from": "monolithic-workflow",
+  "to": "evidence-derived-router",
+  "baselineCommit": "06bab4bd26e2f48fa02dad16a29a216086244bbc",
+  "migratedAt": "2026-08-22T00:53:33.000Z",
+  "legacyEvidence": [
+    "docs/specs/a-plus-b.md",
+    "docs/specs/restore-grilling-onboarding.md"
+  ],
+  "notes": [
+    "Removed .ai-sdlc/WORKFLOW.md as an active authority.",
+    "Moved static contracts, templates and executable code to .ai-sdlc-framework/.",
+    "Kept historical Demo Specs unchanged as audit evidence; they are not active work records."
+  ]
+}

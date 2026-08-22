@@ -7,6 +7,3 @@
 4. `choose-mode` 使用固定模式提示；需要跨 Session 備份時可先 Push 目前 feature branch，但不開 PR、不要求 CI。`deliver` 依 `deliveryPolicy` 取得需要的明確授權，先執行 publish preflight，再使用受信任的平台 Adapter。
 5. Frozen Spec、驗證或 Review 證據不一致時 fail closed，不以對話記憶補寫狀態；Repository 內更具體的安全、技術與交付規則優先。
 <!-- ai-sdlc-framework:end -->
-## 專案協作規則
-
-- 每項工作開始前，完整讀取 [`PROJECT_RULES.md`](PROJECT_RULES.md) 並遵守其中規則。

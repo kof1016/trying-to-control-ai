@@ -1,0 +1,4 @@
+interface:
+  display_name: "審查實作與測試"
+  short_description: "以兩份獨立 verdict 審查實作正確性與測試證據"
+  default_prompt: "使用 $review-change 依 inspect 指示，對目前 commit 分別執行 Implementation 與 Test Review。"

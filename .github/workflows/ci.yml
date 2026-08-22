@@ -14,6 +14,48 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  framework:
+    name: Framework / contract and clean-room
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out full history
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Set up Temurin 25 for the A+B replay
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Build allowlisted package
+        run: node scripts/build-framework-package.mjs
+
+      - name: Verify Framework installation
+        run: node .ai-sdlc-framework/bin/ai-sdlc.mjs check-install
+
+      - name: Run Framework tests
+        run: node --test test/framework/*.test.mjs
+
+      - name: Run clean-room drills
+        run: node scripts/clean-room.mjs
+
+      - name: Upload Framework package
+        uses: actions/upload-artifact@v6
+        with:
+          name: AI-SDLC-FRAMEWORK
+          path: dist/AI-SDLC-FRAMEWORK.zip
+          if-no-files-found: error
+
   verify:
     name: Java 25 / Maven verify
     runs-on: ubuntu-latest

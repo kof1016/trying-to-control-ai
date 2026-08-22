@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-sdlc.local/contracts/work.schema.json",
+  "title": "AI-SDLC work record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "workId", "kind", "branch", "base", "requestPath", "specPath", "confirmed", "freeze", "mode", "createdAt"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "workId": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "kind": {"enum": ["PRODUCT", "SETUP", "MIGRATION", "FRAMEWORK"]},
+    "branch": {"type": "string", "minLength": 1},
+    "base": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["branch", "sha"],
+      "properties": {
+        "branch": {"type": "string", "minLength": 1},
+        "sha": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "requestPath": {"type": "string", "pattern": "^\\.ai-sdlc/work/[a-z0-9-]+/request\\.md$"},
+    "specPath": {"type": "string", "pattern": "^\\.ai-sdlc/work/[a-z0-9-]+/spec\\.md$"},
+    "confirmed": {
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source", "at", "specSha256"],
+          "properties": {
+            "source": {"type": "string", "minLength": 1},
+            "at": {"type": "string", "format": "date-time"},
+            "specSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        }
+      ]
+    },
+    "freeze": {
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["commitSha", "specSha256", "at"],
+          "properties": {
+            "commitSha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "specSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "at": {"type": "string", "format": "date-time"}
+          }
+        }
+      ]
+    },
+    "mode": {
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "at"],
+          "properties": {
+            "name": {"enum": ["supervised", "delegated", "autonomous"]},
+            "at": {"type": "string", "format": "date-time"}
+          }
+        }
+      ]
+    },
+    "changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["reason", "at", "previousFreezeCommit"],
+        "properties": {
+          "reason": {"type": "string", "minLength": 1},
+          "at": {"type": "string", "format": "date-time"},
+          "previousFreezeCommit": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+        }
+      }
+    },
+    "createdAt": {"type": "string", "format": "date-time"}
+  }
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "實作軟體變更"
+  short_description: "依已確認 Spec 完成 TDD 實作、修正與本機驗證"
+  default_prompt: "使用 $implement-change 依已凍結 Spec 完成目前工作的 TDD 實作與本機驗證。"

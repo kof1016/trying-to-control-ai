@@ -1,58 +1,75 @@
-# 開發與基線驗證
+# 開發與驗證
 
-本專案使用 Java 25、Spring Boot 4.1.1 與 Maven Wrapper。IDE 可提供操作入口，但 Maven Wrapper 命令是本機與 CI 共用的驗證來源。
+本 Repository 同時包含 AI-SDLC Framework 與 Spring Boot Demo。Framework 使用 Node.js 20 以上且沒有 npm runtime dependency；Demo 使用 Java 25、Spring Boot 4.1.1 與 Maven Wrapper 3.9.16。
 
 ## 必要環境
 
-- JDK 25。
-- `JAVA_HOME` 指向 JDK 25，且 `java` 可由命令列執行。
-- 不需另外安裝 Maven；Repository 內的 Wrapper 會下載鎖定的 Maven 3.9.16。
+- Git。
+- Node.js 20 以上。
+- JDK 25，`JAVA_HOME` 指向該 JDK。
+- 可執行 Repository 內的 Maven Wrapper；不需另裝 Maven。
 
-目前已驗證的本機 JDK 位於：
+## Framework
 
-```text
-C:\Users\kof10\.jdks\temurin-25.0.4
+產生 allowlisted 發行包與 manifest：
+
+```bash
+node scripts/build-framework-package.mjs
 ```
 
-PowerShell 工作階段若尚未設定 Java，可先執行：
+執行 contract／workflow tests：
 
-```powershell
-$env:JAVA_HOME = 'C:\Users\kof10\.jdks\temurin-25.0.4'
-$env:Path = "$env:JAVA_HOME\bin;$env:Path"
+```bash
+node --test test/framework/*.test.mjs
 ```
 
-## 常用命令
+執行完整 Clean-room drills：
 
-套用程式碼與文件格式：
-
-```powershell
-.\mvnw.cmd spotless:apply
+```bash
+node scripts/clean-room.mjs
 ```
 
-執行格式、靜態編譯檢查、測試、Build 與 Coverage：
+驗證目前安裝副本：
 
-```powershell
-.\mvnw.cmd verify
+```bash
+node .ai-sdlc-framework/bin/ai-sdlc.mjs check-install
+```
+
+## Demo
+
+套用 Java 與文件格式：
+
+```bash
+bash ./mvnw spotless:apply
+```
+
+執行格式、編譯警告、測試、Build 與 Coverage gate：
+
+```bash
+bash ./mvnw --batch-mode --no-transfer-progress verify
 ```
 
 只執行測試：
 
-```powershell
-.\mvnw.cmd test
+```bash
+bash ./mvnw test
 ```
 
-啟動應用程式：
+Coverage 報告在 `target/site/jacoco/index.html`。
 
-```powershell
-.\mvnw.cmd spring-boot:run
-```
+## 需求流程
 
-Coverage 報告產生於 `target/site/jacoco/index.html`。
+1. 從最新 `main` 建立或由 CLI 建立 feature branch。
+2. 整理 Spec，由人確認目前內容，再建立 Spec-only Freeze commit。
+3. Freeze 後選擇模式；可以 Push branch 作備份，但此時不開 PR，也不要求 CI。
+4. 依 Frozen Spec 進行 TDD、完整本機驗證、Implementation Review 與 Test Review。
+5. `preflight` 通過後 Push 並建立一個 PR；任何新 commit 都要重跑驗證與兩份 Review。
+6. 受信任的 GitHub Adapter 即時查詢目標 branch、Required Checks、review decision／threads、conflicts 與 mergeability，將 Draft 轉 Ready 後在 Merge 入口立即重查；非 Required CI 不作額外 gate。
 
-## 基線範圍
+`AGENTS.md` 是 Router；不得重新引入 `.ai-sdlc/WORKFLOW.md` 或另一份平行流程規則。
 
-初始專案只包含 Spring Boot 啟動類別及 context-load smoke test，尚未包含產品功能或產品 Unit Test。任何新需求都必須先依 `.ai-sdlc/WORKFLOW.md` 選擇模式、確認 Spec，再用 TDD 實作。
+## CI
 
-## GitHub CI
+`.github/workflows/ci.yml` 只在 Pull Request 與 `main` 更新時執行，不因單純 Push feature branch 而啟動。CI 會在乾淨環境重跑 Framework tests、Clean-room 與 Maven `verify`。
 
-Pull Request 與 `main` 更新時，`.github/workflows/ci.yml` 會在乾淨的 Ubuntu／Temurin 25 環境執行 Maven Wrapper `verify`。本機應先通過相同命令，再 Push 到 GitHub。
+Repository 目前是否有 Branch Protection／Required Checks，必須以 GitHub 即時查詢結果為準；configured check 成功不等於它被設定為 Required。

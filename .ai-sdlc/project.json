@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "frameworkVersion": "2.1.0",
+  "projectId": "ai-work-flow-demo",
+  "setup": {
+    "mode": "ADOPT_EXISTING",
+    "createdAt": "2026-08-22T01:12:21.142Z",
+    "baselineCommit": "06bab4bd26e2f48fa02dad16a29a216086244bbc"
+  },
+  "defaultBranch": "main",
+  "checks": [
+    {
+      "id": "framework-contracts",
+      "command": [
+        "node",
+        "--test",
+        "test/framework/evidence.test.mjs",
+        "test/framework/github-adapter.test.mjs",
+        "test/framework/installation-and-setup.test.mjs",
+        "test/framework/workflow.test.mjs"
+      ],
+      "timeoutSeconds": 300
+    },
+    {
+      "id": "framework-clean-room",
+      "command": [
+        "node",
+        "scripts/clean-room.mjs"
+      ],
+      "timeoutSeconds": 1200
+    },
+    {
+      "id": "maven-verify",
+      "command": [
+        "bash",
+        "./mvnw",
+        "--batch-mode",
+        "--no-transfer-progress",
+        "verify"
+      ],
+      "timeoutSeconds": 1200
+    }
+  ],
+  "frameworkLockSha256": "cffb00499fcdebdfec52daaf17fc94629e1e590cb7c8257b1d77d831afe3f152"
+}
