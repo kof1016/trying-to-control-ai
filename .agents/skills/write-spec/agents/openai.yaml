@@ -1,0 +1,5 @@
+interface:
+  display_name: "撰寫規格"
+  short_description: "把需求整理成可實作且不綁定實作方法的正式 Spec"
+  default_prompt: "使用 $write-spec 將這項需求整理成可實作、可驗收的正式 Spec。"
+
