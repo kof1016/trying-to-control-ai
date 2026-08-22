@@ -21,7 +21,7 @@
     ".ai-sdlc-framework/contracts/toolchain.schema.json": "47999a3c3242649d45a02183afa104d1e962a8bb3f97f82e74ae49e31ccecd6b",
     ".ai-sdlc-framework/contracts/work.schema.json": "76acb610387b8d7d32e41ab2f63a6f1790493d196b39337c83c992b4bd1a44a6",
     ".ai-sdlc-framework/lib/contracts.mjs": "7a5f6ba129176a6f9edd7dbe841523494757cd8cc55a78fed6c5e4f9876d99e6",
-    ".ai-sdlc-framework/lib/engine.mjs": "5cf0c7220d9c7788b8f1cf8a61b749faa18c5bb7e255c20dcdedf9b283f9b8a0",
+    ".ai-sdlc-framework/lib/engine.mjs": "fc6e8cd82366c7df3d5668947233d3fdd4415560dc4fec18124fc1d0e7cefac6",
     ".ai-sdlc-framework/lib/git.mjs": "62e23819936f872b000a3f58a1f67a69fbf82f95669a6b98a6fd137cd7dd9848",
     ".ai-sdlc-framework/lib/github-adapter.mjs": "1efa49eff99d62d53341f546335fad03d605a0309a47c61a7d3bc0ec9116ff73",
     ".ai-sdlc-framework/lib/utils.mjs": "21d3d687424097c1844d13841edd903ae5bb9b5831daa36a6ca513a1d3fa9647",

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "frameworkVersion": "2.1.0",
-  "manifestSha256": "cffb00499fcdebdfec52daaf17fc94629e1e590cb7c8257b1d77d831afe3f152",
+  "manifestSha256": "92468e9de2e6e9b2279eb8baf7c105e9f72597a1b7717a622a43eb27e252f849",
   "managedFiles": {
     ".agents/skills/define-requirement/SKILL.md": "0bf6384cbf8a4a51d263ecfeae0f634d60126ce4133b138363becb5e09b6a5f6",
     ".agents/skills/define-requirement/agents/openai.yaml": "1885f7c4b27c6ea4ec7be0e9d0b4ef11f8a8c33b1e37a987c9a07baeda45b216",
@@ -22,7 +22,7 @@
     ".ai-sdlc-framework/contracts/toolchain.schema.json": "47999a3c3242649d45a02183afa104d1e962a8bb3f97f82e74ae49e31ccecd6b",
     ".ai-sdlc-framework/contracts/work.schema.json": "76acb610387b8d7d32e41ab2f63a6f1790493d196b39337c83c992b4bd1a44a6",
     ".ai-sdlc-framework/lib/contracts.mjs": "7a5f6ba129176a6f9edd7dbe841523494757cd8cc55a78fed6c5e4f9876d99e6",
-    ".ai-sdlc-framework/lib/engine.mjs": "5cf0c7220d9c7788b8f1cf8a61b749faa18c5bb7e255c20dcdedf9b283f9b8a0",
+    ".ai-sdlc-framework/lib/engine.mjs": "fc6e8cd82366c7df3d5668947233d3fdd4415560dc4fec18124fc1d0e7cefac6",
     ".ai-sdlc-framework/lib/git.mjs": "62e23819936f872b000a3f58a1f67a69fbf82f95669a6b98a6fd137cd7dd9848",
     ".ai-sdlc-framework/lib/github-adapter.mjs": "1efa49eff99d62d53341f546335fad03d605a0309a47c61a7d3bc0ec9116ff73",
     ".ai-sdlc-framework/lib/utils.mjs": "21d3d687424097c1844d13841edd903ae5bb9b5831daa36a6ca513a1d3fa9647",
@@ -32,5 +32,5 @@
     ".ai-sdlc-framework/templates/PULL_REQUEST.md": "679e0a338d9beb98586123432cfda3688df2868aabb03b2586f04a759f1c68c4",
     ".ai-sdlc-framework/templates/SPEC.md": "56ddb00675adb1c1b9b53b33571e8ab19d135dd14a73c91bbdcb52c92c85db20"
   },
-  "installedAt": "2026-08-22T02:39:50.452Z"
+  "installedAt": "2026-08-22T07:54:47.796Z"
 }

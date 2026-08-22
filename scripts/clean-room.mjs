@@ -100,6 +100,22 @@ async function makeRepository(name) {
   return repository;
 }
 
+async function useHistoricalSpotlessJavaEndings(repository) {
+  if (process.platform !== "win32") return;
+  const infoAttributes = path.resolve(repository, git(repository, ["rev-parse", "--git-path", "info/attributes"]).stdout.trim());
+  await appendFile(infoAttributes, "*.java text eol=crlf\n", "utf8");
+  git(repository, ["config", "core.autocrlf", "true"]);
+  const javaFiles = git(repository, ["ls-files", "-z", "src/main/java", "src/test/java"]).stdout.split("\0").filter(Boolean);
+  for (const relativePath of javaFiles) {
+    const filePath = path.join(repository, relativePath);
+    const text = await readFile(filePath, "utf8");
+    await writeFile(filePath, text.replace(/\r\n|\r|\n/gu, "\n").replaceAll("\n", "\r\n"), "utf8");
+  }
+  git(repository, ["add", "--renormalize", "--", ...javaFiles]);
+  const status = git(repository, ["status", "--porcelain"]).stdout.trim();
+  if (status) throw new Error(`Historical Spotless Java line-ending adaptation changed Git content: ${status}`);
+}
+
 function record(id, status, evidence, note = undefined) {
   results.push({ id, status, evidence, ...(note ? { note } : {}) });
 }
@@ -123,7 +139,7 @@ try {
   const mattLock = JSON.parse(await readFile(path.join(packageRoot, ".ai-sdlc-framework/locks/matt-skills.lock.json"), "utf8"));
   const suppliedMattCheckout = process.env.AI_SDLC_MATT_SKILLS_CHECKOUT;
   const mattCheckout = suppliedMattCheckout ? path.resolve(suppliedMattCheckout) : path.join(workspace, "matt-skills");
-  if (!suppliedMattCheckout) run("git", ["clone", "--quiet", "--depth", "1", "--branch", mattLock.tag, mattLock.repository, mattCheckout], workspace);
+  if (!suppliedMattCheckout) run("git", ["clone", "--config", "core.autocrlf=false", "--quiet", "--depth", "1", "--branch", mattLock.tag, mattLock.repository, mattCheckout], workspace);
   function installFramework(target) {
     run(process.execPath, [install, "--source", packageRoot, "--target", target], packageRoot);
     run(process.execPath, [installMatt, "--target", target, "--checkout", mattCheckout], packageRoot);
@@ -335,7 +351,7 @@ try {
   const demo = path.join(workspace, "demo-replay");
   const demoBase = "15ee40fc1511ce24d23eb3f96eee81ba76e9ebcc";
   const demoFeature = "cf8911050b7641b5f7c89db682d20bab7fbbe1ce";
-  run("git", ["clone", "--quiet", "--no-hardlinks", root, demo], workspace);
+  run("git", ["clone", "--config", "core.autocrlf=false", "--quiet", "--no-hardlinks", root, demo], workspace);
   git(demo, ["switch", "-c", "replay-base", demoBase]);
   git(demo, ["config", "user.name", "Clean Room"]);
   git(demo, ["config", "user.email", "clean-room@example.invalid"]);
@@ -343,6 +359,7 @@ try {
   if (!JSON.parse(installedDemo.stdout).migratedLegacy) throw new Error("Known simplified-v2.1 layout was not migrated during ADOPT.");
   run(process.execPath, [installMatt, "--target", demo, "--checkout", mattCheckout], packageRoot);
   commit(demo, "chore: install simplified AI-SDLC Framework");
+  await useHistoricalSpotlessJavaEndings(demo);
   const demoToolchain = path.join(workspace, "demo-toolchain.json");
   await writeFile(demoToolchain, `${JSON.stringify({ schemaVersion: 1, checks: [{
     id: "maven",
