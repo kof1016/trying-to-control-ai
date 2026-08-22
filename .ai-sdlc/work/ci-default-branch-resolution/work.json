@@ -19,7 +19,10 @@
     "specSha256": "d268175c29196025086c44b9fd8e574dd70ecde0f6eaa68efc2de78ab73e3bb2",
     "at": "2026-08-22T07:52:52.165Z"
   },
-  "mode": null,
+  "mode": {
+    "name": "autonomous",
+    "at": "2026-08-22T07:53:29.069Z"
+  },
   "changes": [],
   "createdAt": "2026-08-22T07:50:16.629Z"
 }
