@@ -8,6 +8,8 @@
 
 來源：[mattpocock/skills](https://github.com/mattpocock/skills)，tag `v1.2.3`，commit `6acc160e4e0cd062dbbbd7a1b26ae92855edf07e`。
 
+`grilling`、`codebase-design`、`tdd/tests.md` 與 `tdd/mocking.md` 保留該上游版本內容；`tdd/SKILL.md` 與 `tdd/agents/openai.yaml` 有本地修改，用於對齊 approval、stage ownership 與流程責任邊界。
+
 ## MIT License
 
 Copyright (c) 2026 Matt Pocock

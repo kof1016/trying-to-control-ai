@@ -1,19 +1,19 @@
 ---
 name: review-implementation
-description: "獨立審查已完成驗證的產品實作或 setup，輸出 Implementation／Test verdict 與 findings。交付前或修正後複審時使用；不直接修正。"
+description: "分別從 Implementation／Test 兩個視角審查已完成適用驗證的 committed Head，輸出 verdict 與 findings。交付前或修正後複審時使用；不直接修正。"
 ---
 
 # Review Implementation
 
 ## Uses
 
-- 有新增／重構 module、interface 或 seam 時，讀取 `.agents/skills/codebase-design/SKILL.md`。
-- 有新增／修改產品測試或 Test Review finding 時，讀取 `.agents/skills/tdd/SKILL.md`；需要時再讀 `tests.md`／`mocking.md`。
+- 有新增／重構 module、interface 或 seam 時，讀取 `.agents/skills/codebase-design/SKILL.md`，只使用設計概念；保留既有 domain vocabulary，不因術語偏好不同產生 finding。
+- 有新增／修改產品測試或 Test Review finding 時，讀取 `.agents/skills/tdd/SKILL.md`；需要時再讀 `tests.md`／`mocking.md`。只使用 seam、test quality、anti-pattern 與 mocking 準則，不啟動 Red → Green。
 
 ## Inputs
 
-1. 讀取適用 Spec（純 setup 使用明確 task）、`AGENTS.md`、相對 base 的完整變更及任務內 staged／unstaged 修改。
-2. 確認驗證結果精確對應受審內容；最終交付判定必須對應 committed Head。
+1. 輸入至少包含適用 Spec（純 setup 使用明確 task）、`AGENTS.md`、Base、精確 Head SHA、該 Head 的 validation 命令／結果，以及 `base...HEAD` 的完整 committed diff。
+2. 最終 Review 只審查 `base...HEAD` 的 committed changes，並確認驗證結果精確對應受審 Head。若任務仍有 staged／unstaged 變更，不得對目前 Head 給最終 PASS；回報 scope／Head mismatch 給 root Router。
 
 ## Implementation Review
 
@@ -23,6 +23,7 @@ description: "獨立審查已完成驗證的產品實作或 setup，輸出 Imple
 - 錯誤、邊界、安全、相容性與資料處理是否合理。
 - 是否符合語言、技術棧與既有專案慣例。
 - 是否新增目前需求與既有技術棧不需要的機制。
+- 是否存在形成維護或正確性風險的 code smell：誤導命名、具體重複、死碼、過長多責任、隱藏耦合、不當抽象或無必要複雜度。主觀風格偏好不得形成 finding 或 FAIL。
 
 ## Test Review
 
@@ -39,13 +40,18 @@ Green 或 coverage 百分比不能單獨取代 Test Review。純 setup 則審查
 ## Verdict
 
 ```text
+Scope:
+  Base: <sha>
+  Head: <sha>
+  Validation: <commands and results>
+
 ## Implementation Review
 Verdict: PASS | FAIL
-Findings: None | <severity, location, basis, impact, direction>
+Findings: None | <blocking | non-blocking, responsibility: spec | setup | implementation | test, location, basis, impact, direction>
 
 ## Test Review
 Verdict: PASS | FAIL
-Findings: None | <severity, location, basis, impact, direction>
+Findings: None | <blocking | non-blocking, responsibility: spec | setup | implementation | test, location, basis, impact, direction>
 
 ## Overall
 PASS | FAIL
@@ -53,6 +59,10 @@ PASS | FAIL
 
 任一視角有 blocking finding 時，該視角與 Overall 都是 `FAIL`。
 
+Blocking 只限 Spec／task 違反、correctness、安全、相容性、可重現性或必要測試證據缺失；主觀偏好不得 blocking。所有 PASS／FAIL 與 findings 都回報 root Router。
+
 ## Boundaries
 
+- 分別從 Implementation／Test 兩個視角審查，但不要求不同 Agent、固定 reviewer 或子代理數量。
+- 不修改產品碼或測試、不選擇下一個 Stage Skill，也不負責 Git 交付。
 - Findings 依 root Router 分流；不把偏好、單一數字或檔案數作為 blocking verdict。
