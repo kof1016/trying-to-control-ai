@@ -23,6 +23,12 @@ Root `AGENTS.md` 是唯一的跨階段 Router。只有 Router 能選擇下一個
 
 Support Skill（`grilling`、`tdd`、`codebase-design`）只提供目前階段內的方法，不能取代 Stage Skill 或決定下一階段。
 
+### 交付目標
+
+- 使用者明確指定的 project／技術棧優先；交付目標是 Router context，除非它本身屬於產品契約，否則不寫入 Spec。
+- 未指定且首次需要 project-specific 規則或基線時，supervised 模式先詢問使用者；autonomous 模式選擇有 Repository 證據且不擴大範圍的既有目標，明示目標與依據後繼續。
+- 有適用的既有目標時，不自行改建另一個 project；沒有合理選擇或多個目標同等合理時，依既有硬阻塞停止並詢問使用者。
+
 | 情況 | 使用 Skill |
 | --- | --- |
 | 純 setup task 缺少可重現的 build/test 基線或有 setup finding | `$prepare-project`；不建立產品 Spec |
@@ -57,4 +63,4 @@ Review、PR review 或 CI 的 blocking finding，或 Review Overall FAIL，強�
 
 ## Autonomous 硬阻塞
 
-只有無法確認正確 Repository／基準、無法安全隔離未提交內容、缺少必要權限或真人 approval、沒有可用驗證途徑、外部 Required CI 持續失敗且無法從 Repository 修正，或公開行為真正互斥且無合理判斷依據時才能停止。
+只有無法確認正確 Repository／基準／交付目標、無法安全隔離未提交內容、缺少必要權限或真人 approval、沒有可用驗證途徑、外部 Required CI 持續失敗且無法從 Repository 修正，或公開行為真正互斥且無合理判斷依據時才能停止。
