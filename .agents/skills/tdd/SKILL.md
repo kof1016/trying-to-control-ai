@@ -23,7 +23,7 @@ A **seam** is the public boundary you test at: the interface where you observe b
 
 **Test only at explicit seams.** Before writing the first test at a seam, state that public seam in the current work context. If the active workflow requires approval, confirm it first; otherwise explain the decision and continue. No test is written at an implicit seam. You can't test everything — making seams explicit is how testing effort lands on the critical paths and complex logic instead of every edge case. Do not create a seam manifest or record file.
 
-Ask: "What's the public interface, and which seams should we test?"
+Determine: "What's the public interface, and which seams should we test?"
 
 When the shape of that interface is itself in question — how deep the module is, where the seam belongs, what the interface should expose — consult the Support Skill at `.agents/skills/codebase-design/SKILL.md`. It supplies design concepts for the current stage and does not decide lifecycle handoff.
 

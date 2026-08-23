@@ -1,4 +1,4 @@
 interface:
   display_name: "審查實作"
-  short_description: "從 Implementation／Test 兩個視角審查已驗證的 committed Head"
-  default_prompt: "使用 $review-implementation 從 Implementation／Test 兩個視角審查已完成適用驗證的 committed Head。"
+  short_description: "審查已驗證的產品或 setup 變更 committed Head"
+  default_prompt: "使用 $review-implementation 審查已完成適用驗證的產品變更或 setup 變更之 committed Head。"
