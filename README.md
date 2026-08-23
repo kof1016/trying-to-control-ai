@@ -40,20 +40,14 @@ Repository 裡的實際範例最後收斂為：`GET /add`、任意位數十進�
 
 ```mermaid
 %%{init: {
-  "theme": "base",
   "themeVariables": {
-    "background": "#FFFFFF",
     "fontFamily": "Microsoft JhengHei, Noto Sans TC, Arial, sans-serif",
     "actorBkg": "#F8FAFC",
     "actorBorder": "#64748B",
     "actorTextColor": "#0F172A",
-    "actorLineColor": "#CBD5E1",
+    "actorLineColor": "#94A3B8",
     "signalColor": "#F97316",
-    "signalTextColor": "#0F172A",
-    "sequenceNumberColor": "#FFFFFF",
-    "labelBoxBkgColor": "#FFFFFF",
-    "labelBoxBorderColor": "#94A3B8",
-    "labelTextColor": "#0F172A"
+    "sequenceNumberColor": "#FFFFFF"
   },
   "sequence": {
     "diagramMarginX": 40,
@@ -86,13 +80,9 @@ sequenceDiagram
 
 ```mermaid
 %%{init: {
-  "theme": "base",
   "themeVariables": {
-    "background": "#FFFFFF",
     "fontFamily": "Microsoft JhengHei, Noto Sans TC, Arial, sans-serif",
-    "primaryTextColor": "#0F172A",
-    "lineColor": "#F97316",
-    "edgeLabelBackground": "#FFFFFF"
+    "lineColor": "#F97316"
   },
   "flowchart": {
     "curve": "stepAfter",
