@@ -35,11 +35,15 @@ Support Skill（`grilling`、`tdd`、`codebase-design`）只提供目前階段�
 
 `validation` 不是獨立 Skill：Stage 內只執行受影響檢查；Candidate Commit 後由 Router 對 committed Head 執行一次完整且適用的交付檢查。
 
+Final validation 與 Review 必須在精確 committed Head 的乾淨工作樹執行。若 staged、unstaged 或 untracked 檔案可能影響驗證內容，不能把結果視為該 Head 的證據；應安全隔離到該 Head 的乾淨 worktree／checkout，無法安全隔離時依既有硬阻塞停止。
+
 一般產品流程：`write-spec →（必要時 prepare-project）→ implement-spec → Commit → validation → review-implementation → PASS：Push → PR → Required CI → Merge`
 
 純 setup 流程：`prepare-project → Commit → validation → review-implementation → Git 交付`
 
-Review、PR review 或 CI finding 由 Router 依責任分流：Spec → `write-spec`；setup → `prepare-project`；產品碼／測試 → `implement-spec`。任何修正產生新 Commit 後，都要對新 Head 重新執行完整適用驗證，並重做 Implementation Review 與 Test Review；只有 Review PASS 後才能 Push、建立 PR、驗證 Required CI 與在符合條件後 Merge。
+Review、PR review 或 CI 的 blocking finding，或 Review Overall FAIL，強制由 Router 依責任分流：Spec → `write-spec`；setup → `prepare-project`；產品碼／測試 → `implement-spec`。Non-blocking finding 照常回報，但可與 PASS 共存，不阻擋後續交付，也不強制進入另一個 Stage；若 Router 決定修正，任何新 Commit 都要對新 Head 重新執行完整適用驗證，並重做 Implementation Review 與 Test Review。
+
+只有 Review PASS 後才能 Push、建立 PR、驗證 Required CI 與在符合條件後 Merge。若目標 base／`main` 在 Merge 前更新，先整合到同一個 feature branch；產生的新 Head 必須重跑完整適用驗證、Implementation Review 與 Test Review。
 
 純文件或簡單設定只做風險相稱的驗證；TDD 只用於可測產品行為，Codebase Design 只用於 coding／refactor。
 

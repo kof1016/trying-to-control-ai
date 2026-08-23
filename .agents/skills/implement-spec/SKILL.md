@@ -8,7 +8,7 @@ description: "依已成立且可實作的 Spec 實作或修正產品碼與測試
 ## Uses
 
 - 新增或重構 module、interface 或 seam 時讀取 `.agents/skills/codebase-design/SKILL.md`；只有重大取捨才讀進階文件。
-- TDD 前讀取 `.agents/skills/tdd/SKILL.md`；需要時再讀 `tests.md`／`mocking.md`。
+- TDD 前讀取 `.agents/skills/tdd/SKILL.md`；需要時再讀 `.agents/skills/tdd/tests.md`／`.agents/skills/tdd/mocking.md`。
 
 ## Workflow
 
@@ -19,8 +19,9 @@ description: "依已成立且可實作的 Spec 實作或修正產品碼與測試
 5. 每個 slice 依序：寫會因行為缺失而失敗的測試、確認正確 Red、完成最小 Green、執行受影響驗證。
 6. 修正行為 finding 時先建立重現測試；純 refactor 或補測試不製造假 Red。
 7. 載入 `codebase-design` 時只採用其設計概念，保留既有 domain vocabulary，不因術語不同而改名。
-8. 完成時回報 changed files 與已完成的驗收條件、vertical slices、每個 slice 有效的 Red／Green 與受影響驗證結果，並提供可供 Agent 建立 coherent Commit 的 candidate；不另建 log 或 evidence file。
-9. 將結果交回 root Router；Candidate Commit 後由 Router 對 committed Head 執行一次完整且適用的 format、static analysis、build、test、coverage 與其他交付檢查。
+8. 只有本次範圍內所有驗收條件已完成、受影響驗證通過且沒有未解 blocker 時，才回報 changed files、已完成的驗收條件、vertical slices、每個 slice 有效的 Red／Green 與受影響驗證結果，並提供可供 Agent 建立 coherent Commit 的 candidate；不另建 implementation log 或 evidence file。
+9. 若仍有未完成驗收條件或 blocker，只回報剩餘事項與證據並交回 root Router，不得產生 ready candidate。
+10. 將結果交回 root Router；Candidate Commit 後由 Router 對 committed Head 執行一次完整且適用的 format、static analysis、build、test、coverage 與其他交付檢查。
 
 ## Boundaries
 

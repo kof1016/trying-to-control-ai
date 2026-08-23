@@ -8,7 +8,7 @@ description: "建立目前交付所需的最小、可重現 build/test 基線。
 ## Workflow
 
 1. 讀取適用的 `AGENTS.md`、build 設定、CI、目錄結構與可用工具。
-2. 確認目前交付缺少基線或存在 setup finding；兩者皆無則記錄目前不需要 setup 變更。
+2. 確認目前交付缺少基線或存在 setup finding；兩者皆無則回報目前不需要 setup 變更。
 3. 沿用既有技術棧；空白產品專案依已成立且可實作的 Spec 選擇工具，純 setup 則依明確 task。
 4. 建立最少必要的檔案、dependency 與設定。
 5. 執行實際 build/test；缺少工具、零測試或未執行的命令不能算通過。
