@@ -1,82 +1,26 @@
-# AI-SDLC Demo
+# Trying to Control AI
 
-> 讓 AI 跟你一起理清規格與功能邊界，再開始寫程式。
+> 我試著控制 AI——不是限制它思考，而是讓它先跟你一起理清規格與功能邊界，再開始寫程式。
 
-第一次把需求交給 AI，通常很驚豔：幾句話、幾分鐘，就得到一大段能跑的程式碼。
+AI 寫得很快；真正讓人不安的，往往不是它完全做錯，而是它做得比你要求更多：
 
-但用久之後，人很容易變成從頭跟到尾的 QA。程式跑得動、測試也通過，卻還是不確定 AI 做的是不是自己真正要的；更麻煩的是，它經常不是完全做錯，而是做得比要求更多。
+- 自行補上沒有說出口的假設。
+- 順手增加功能，或為想像中的擴充性多做幾層架構。
+- 程式能跑、測試也通過，人卻還是不確定這是不是自己真正要的。
 
-AI 不像傳統程式，只執行固定流程。它會理解語意、推論缺口，再補上它認為合理的答案。猜對時很神奇；猜錯時，可能跳過必要步驟、順手增加功能，或為想像中的擴充性多抽幾層架構。最後沒有人確定：哪些東西真的有必要？
+這個 Demo 把 AI 的推理能力用在更前面：先一起把需求、功能邊界與驗收方式說清楚，確認 Spec，再依同一份內容完成實作、測試、Review 與交付。
 
-這個 Demo 不試圖讓 AI 停止推論，而是把它的推理能力用在更前面：先協助使用者把需求、邊界與驗收方式說清楚，確認 Spec，再依同一份內容完成實作、測試、Review 與交付。
+信任不是要 AI 保證不犯錯，而是讓影響產品的決定與最後如何驗收，都能被看見。
 
-信任不是靠 AI 保證自己不會犯錯，而是讓影響產品契約的假設、功能邊界，以及最後如何驗收，都能被看見。這不能消除所有錯誤，但能讓問題更早浮現，也更容易回到正確的地方修正。
+## 一個 A＋B，真的那麼簡單嗎？
 
-```text
-常見方式：需求 → 直接寫 Code → 收到大量結果 → 人開始追著驗收與修正
-這個 Demo：需求 → 一起釐清 → 確認 Spec → 實作與測試 → Review → 交付
-```
+「做一個 A＋B API」看起來不能再簡單，但介面、可接受的數值、錯誤回應，以及哪些功能明確不做，都需要先決定。
 
-## 一個 A＋B，真的有那麼簡單嗎？
+這個例子刻意保持簡單，讓真正的主角回到需求如何被問清楚、收斂並成為可驗收的 Spec。實際結果見 [`specs/addition-api.md`](specs/addition-api.md)。
 
-「做一個 A＋B API」聽起來簡單到不能再簡單。真的開始定義時，問題卻會一個個冒出來：
+## 整個工作流
 
-- 要用什麼介面？
-- 只接受整數，還是也包含小數？負數呢？
-- 數字超出 32 或 64 位元時怎麼辦？
-- 無效輸入回什麼狀態？
-- 結果是 JSON number 還是 string？
-- 哪些功能明確不做？
-
-這些不是枝微末節，而是「做對」究竟代表什麼。
-
-Repository 裡的實際範例最後收斂為：`GET /add`、任意位數十進位整數、無效輸入回 `400`、結果以字串表示，並明確排除小數、其他運算與持久化。完整契約見 [`specs/addition-api.md`](specs/addition-api.md)。
-
-## 先確認，再動手
-
-使用者不需要先寫好完整規格，只要先說明需求。AI 會把影響產品行為的重要決定攤開，與使用者確認後再往下做。
-
-下圖呈現預設的逐步確認模式；在全自動模式中，AI 會依證據定稿，並記錄影響產品契約的假設。
-
-```mermaid
-%%{init: {
-  "themeVariables": {
-    "fontFamily": "Microsoft JhengHei, Noto Sans TC, Arial, sans-serif",
-    "actorBkg": "#F8FAFC",
-    "actorBorder": "#64748B",
-    "actorTextColor": "#0F172A",
-    "actorLineColor": "#94A3B8",
-    "signalColor": "#F97316",
-    "sequenceNumberColor": "#FFFFFF"
-  },
-  "sequence": {
-    "diagramMarginX": 40,
-    "diagramMarginY": 20,
-    "actorMargin": 90,
-    "messageMargin": 40,
-    "mirrorActors": false
-  }
-}}%%
-sequenceDiagram
-    autonumber
-
-    actor U as 使用者
-    participant A as AI
-    participant P as 專案
-
-    U->>A: 說明需求
-    A-->>U: 釐清 Spec 與功能邊界
-    U->>A: 確認 Spec
-    A->>P: 依 Spec 實作與測試
-    A->>P: 完整驗證與兩種 Review
-    A-->>U: 交付結果與驗證證據
-```
-
-重點不是讓 AI 少思考，而是讓它先幫忙找出人可能遺漏的產品決定，再把已確認的內容帶進後續工作。
-
-## 從 Spec 到交付
-
-主流程保持簡單：一路往下完成工作。Blocking finding 或 Overall FAIL 必須回到對應階段；non-blocking finding 不強制回流，但若決定修正，新 Commit 仍須重新驗證與 Review。
+需求不是問一次就結束。使用者與 AI 會持續釐清問題、確認取捨，直到共同確認 Spec，再把它帶進後續工作。
 
 ```mermaid
 %%{init: {
@@ -86,55 +30,72 @@ sequenceDiagram
   },
   "flowchart": {
     "curve": "stepAfter",
-    "nodeSpacing": 45,
-    "rankSpacing": 55
+    "nodeSpacing": 36,
+    "rankSpacing": 42
   }
 }}%%
 flowchart TB
-    S([需求釐清]):::start --> P[Spec 確認]:::step
-    P --> I[實作與測試]:::step
-    I --> C[提交候選版本]:::step
-    C --> V[提交後完整驗證]:::step
+    S([需求釐清與 Spec 確認]):::start --> I[依 Spec 實作與測試]:::step
+    S -. 需要時 .-> E[準備驗證基線]:::optional
+    E --> I
 
-    V --> IR["Implementation Review<br/>實作是否符合 Spec"]:::review
-    V --> TR["Test Review<br/>測試是否足以驗收 Spec"]:::review
-    IR --> Q{"兩項 Review<br/>都通過？"}:::decision
-    TR --> Q
+    I --> C[產品程式碼]:::artifact
+    I --> T[測試程式碼]:::artifact
+    C --> V[提交並完整驗證]:::validation
+    T --> V
 
-    Q -->|Spec 需調整| SF[重新確認 Spec]:::fix
-    Q -->|通過| G([交付]):::delivery
-    Q -->|實作／測試需修正| CF[修正並重新提交]:::fix
+    V --> IR{"實作 Review<br/>通過？"}:::decision
+    V --> TR{"測試 Review<br/>通過？"}:::decision
 
-    SF -. 回到規格 .-> P
-    CF -. 重新驗證 .-> V
+    IR -->|是| OK[兩種 Review 均通過]:::passed
+    TR -->|是| OK
+    IR -. 否 .-> I
+    TR -. 否 .-> I
+
+    OK --> D([進入交付流程]):::delivery
 
     classDef start fill:#F8FAFC,stroke:#64748B,color:#0F172A,stroke-width:2px;
+    classDef optional fill:#F1F5F9,stroke:#94A3B8,color:#334155,stroke-width:1.5px,stroke-dasharray:5 4;
     classDef step fill:#F8FAFC,stroke:#64748B,color:#0F172A,stroke-width:2px;
-    classDef review fill:#FFF7ED,stroke:#F97316,color:#0F172A,stroke-width:2px;
-    classDef decision fill:#FFFBEB,stroke:#F59E0B,color:#0F172A,stroke-width:2px;
-    classDef fix fill:#FFF7ED,stroke:#F97316,color:#9A3412,stroke-width:2px;
+    classDef artifact fill:#EFF6FF,stroke:#3B82F6,color:#172554,stroke-width:2px;
+    classDef validation fill:#F8FAFC,stroke:#64748B,color:#0F172A,stroke-width:2px;
+    classDef decision fill:#FFFBEB,stroke:#F59E0B,color:#78350F,stroke-width:2px;
+    classDef passed fill:#ECFDF5,stroke:#10B981,color:#064E3B,stroke-width:2px;
     classDef delivery fill:#ECFDF5,stroke:#10B981,color:#064E3B,stroke-width:2px;
     linkStyle default stroke:#F97316,stroke-width:2px;
 ```
 
-這裡刻意把 Review 分成兩個視角：
+- **Implementation Review**：確認產品程式碼符合 Spec，沒有越界或不必要的複雜度。
+- **Test Review**：確認測試本身足以驗收 Spec，而不只是看測試有沒有變綠。
 
-- **Implementation Review**：確認實作符合 Spec、沒有越界，也沒有不必要的功能或抽象。
-- **Test Review**：確認測試本身真的能驗收行為與風險，不只是看測試有沒有變綠。
+圖中的「否」以虛線畫出最常見的實作／測試修正回圈。實際上，Review finding 會依責任回到 Spec、驗證基線或實作／測試；任何修正都要重新提交、完整驗證，並重做兩種 Review。
 
-兩種 Review 都對準同一個已提交版本。Blocking finding 或 Overall FAIL 會依問題責任分流：規格問題回到 `write-spec`；setup 問題回到 `prepare-project`；實作或測試問題回到 `implement-spec`。Non-blocking finding 可以和 PASS 共存；若仍決定修正，新 Commit 也要重新完成完整驗證與兩種 Review。圖中只畫最常見的 Spec 與實作／測試回圈，避免讓例外分支淹沒主流程。
+## 流程留下什麼
 
-## 實際 Demo 證據
+A＋B 範例保留了從需求到交付的可追溯產物：
 
-Spring Boot 範例保留這套流程的一組可追溯交付產物：任意大小十進位整數的加法 API。
-
-| 證據 | 結果 |
+| 產物 | 實際證據 |
 | --- | --- |
-| Spec | [`specs/addition-api.md`](specs/addition-api.md) 定義公開行為、邊界、錯誤與非目標。 |
-| 實作與測試 | [`AdditionController.java`](examples/spring-boot/src/main/java/com/github/kof1016/aiworkflowdemo/AdditionController.java) 與 [`AdditionApiTests.java`](examples/spring-boot/src/test/java/com/github/kof1016/aiworkflowdemo/AdditionApiTests.java)。 |
-| Review | [PR #12](https://github.com/kof1016/ai-work-flow-demo/pull/12) 記錄 Implementation Review PASS；Test Review PASS，並保留一項不阻擋交付的未來 JDK 相容性 setup 提醒。 |
-| CI | [Spring Boot CI run #11](https://github.com/kof1016/ai-work-flow-demo/actions/runs/32611234214) 實際執行 11 項測試並通過。 |
-| Merge | 已合併至 `main`：[`25681d6`](https://github.com/kof1016/ai-work-flow-demo/commit/25681d6bf9568aeb9d8ca113975988ed5fef13b4)。 |
+| Spec 文件 | [`specs/addition-api.md`](specs/addition-api.md) 記錄產品行為、邊界、錯誤與非目標。 |
+| 產品程式碼 | [`AdditionController.java`](examples/spring-boot/src/main/java/com/github/kof1016/aiworkflowdemo/AdditionController.java)。 |
+| 測試程式碼 | [`AdditionApiTests.java`](examples/spring-boot/src/test/java/com/github/kof1016/aiworkflowdemo/AdditionApiTests.java)。 |
+| Review 紀錄 | [PR #12](https://github.com/kof1016/trying-to-control-ai/pull/12) 記錄 Implementation Review 與 Test Review 結果。 |
+| 交付證據 | [GitHub Actions run #11](https://github.com/kof1016/trying-to-control-ai/actions/runs/32611234214) 與合併至 `main` 的 [`25681d6`](https://github.com/kof1016/trying-to-control-ai/commit/25681d6bf9568aeb9d8ca113975988ed5fef13b4)。 |
+
+## Skill 如何分工
+
+每個 Skill 只完成一項責任；完成後回報結果，再由 root [`AGENTS.md`](AGENTS.md) 根據目前證據判斷下一步。
+
+| Step | Skill |
+| --- | --- |
+| 釐清需求並確認 Spec | `write-spec` |
+| 按需建立驗證基線 | `prepare-project` |
+| 實作產品與測試 | `implement-spec` |
+| Implementation／Test Review | `review-implementation` |
+
+兩種 Review 是同一個 `review-implementation` Skill 的獨立視角，沒有固定先後。`grilling`、`tdd` 與 `codebase-design` 則是階段內按需使用的方法，不負責切換流程。
+
+整條工作流主要由 Repository 規則、Skills 與 AI 的判斷銜接，沒有另外撰寫一個外部程式把每一步硬編碼起來。
 
 ## 最短使用方式
 
@@ -147,75 +108,47 @@ Spring Boot 範例保留這套流程的一組可追溯交付產物：任意大�
 <用自然語言描述需求>
 ```
 
-預設會使用逐步確認模式；若要快速測試整條流程，可要求「切換到全自動模式」。
-
-## 逐步確認與全自動
-
-| 模式 | 適合情境 | 行為 |
-| --- | --- | --- |
-| 逐步確認（supervised） | 希望參與產品決策 | AI 提出問題與建議，使用者確認後才讓 Spec 成立；這是預設模式。 |
-| 全自動（autonomous） | 快速測試完整流程 | AI 依 Repository 證據定稿並記錄影響契約的假設，自動完成 Commit、Push、PR、Required CI 驗證與條件成立後 Merge；只有硬阻塞或明確排除才停止。 |
-
-模式改變的是決策方式與自動化程度，不會略過適用的 Spec、測試、驗證或 Review。
-
-## Skill 是能力，不是流程
-
-每個 Skill 只負責一件事。完成目前階段後，它會回報結果；root [`AGENTS.md`](AGENTS.md) 的 Router 再根據目前證據判斷下一步。
-
-| Step | 這一步在確認什麼 | 對應 Skill |
-| --- | --- | --- |
-| 需求釐清、Spec 確認 | 收斂產品行為、重要邊界與驗收條件 | `write-spec` |
-| 按需準備環境 | 建立目前交付所需的最小、可重現 build/test 基線 | `prepare-project` |
-| 實作與測試 | 依已成立的 Spec 完成產品碼與測試 | `implement-spec` |
-| Implementation Review | 審查 Spec 符合度、正確性、越界與維護風險 | `review-implementation` 的第一個視角 |
-| Test Review | 審查測試設計、重要路徑與實際執行證據 | `review-implementation` 的第二個視角 |
-
-兩種 Review 是同一個 `review-implementation` Skill 的獨立視角，沒有固定先後。`grilling`、`tdd` 與 `codebase-design` 則是階段內按需使用的方法，不負責切換流程。
-
-Candidate Commit、完整驗證、finding 分流與 Git 交付由 Router 負責，不需要再包成 Skill。這在概念上接近依結果轉移狀態，但不是由外部程式硬編碼整條流程；Agent 每次收到階段結果後，都會依目前證據重新判斷。
-
-Skill 也不是越多越好。責任重複、判斷衝突或容易誤觸的能力，反而會讓 AI 更難知道自己此刻應該做什麼；因此這裡優先保持簡單與單一職責。
-
-### Setup 按需要出現
-
-主流程沒有固定的 Setup 步驟。只有缺少可重現的 build/test 基線，或出現 setup finding 時，Router 才會插入 `prepare-project`。
-
-流程本身不綁定 Spring Boot、Java 或特定工具。`prepare-project` 會沿用既有技術棧，建立目前交付所需的最小基線，實際執行 build/test，再交回 Router 決定下一步。
+預設採逐步確認：重要決策由使用者確認後再繼續。全自動模式則由 AI 依 Repository 證據與建議選項定稿，記錄影響契約的假設，並自動完成後續交付。
 
 ## Repository 結構
 
 ```text
-.agents/skills/           Repository-scoped Skills
-  write-spec/             產生可驗收 Spec
-  prepare-project/        按需建立 build/test 基線
-  implement-spec/         依 Spec 實作與測試
-  review-implementation/  Implementation／Test Review
-  grilling/               需求追問方法
-  tdd/                    TDD 與測試方法
-  codebase-design/        Codebase 設計方法
-.github/                  PR template 與 CI
-examples/spring-boot/     可執行的 Spring Boot Demo
-specs/                    目前產品行為契約
-AGENTS.md                 跨階段 Router 規則
-CONVERSATION_RULES.md     對話與回覆規則
-THIRD_PARTY_NOTICES.md    第三方來源與授權
+.
+├── .agents/
+│   └── skills/
+│       ├── write-spec/             釐清並產生可驗收的 Spec
+│       ├── prepare-project/        按需建立驗證基線
+│       ├── implement-spec/         依 Spec 實作產品與測試
+│       ├── review-implementation/  Implementation／Test Review
+│       ├── grilling/               需求追問方法
+│       ├── tdd/                    測試先行方法
+│       └── codebase-design/        Codebase 設計方法
+├── .github/
+│   ├── pull_request_template.md    交付與 Review 紀錄格式
+│   └── workflows/
+│       └── spring-boot.yml         GitHub Actions CI
+├── examples/
+│   └── spring-boot/                可執行的 Java 範例
+├── specs/
+│   └── addition-api.md             A＋B 產品 Spec
+├── AGENTS.md                       跨階段 Router 規則
+├── CONVERSATION_RULES.md           對話與回覆規則
+└── THIRD_PARTY_NOTICES.md          第三方來源與授權
 ```
 
-## 執行 Spring Boot 範例
+## 重現 Java 範例
 
-範例使用 Java 25 與 Maven Wrapper。進入 `examples/spring-boot/` 後驗證：
+準備 JDK 25，進入 `examples/spring-boot/` 後執行完整驗證：
 
 ```bash
 ./mvnw --batch-mode --no-transfer-progress verify
 ```
 
-先在一個終端啟動應用程式：
+啟動應用程式後，可從另一個終端呼叫 API：
 
 ```bash
 ./mvnw spring-boot:run
 ```
-
-再於另一個終端呼叫 API：
 
 ```bash
 curl "http://localhost:8080/add?a=1&b=2"
@@ -223,6 +156,26 @@ curl "http://localhost:8080/add?a=1&b=2"
 ```
 
 Windows 使用 `mvnw.cmd`。
+
+## 開發環境與驗證基線
+
+這套流程不綁定語言。AI 會先沿用專案既有技術棧；缺少可重現的驗證基線時，再補齊目前交付所需的最小專案設定、依賴與命令，讓適用的格式檢查、靜態分析、編譯、測試與建置可以重複執行。
+
+下表是常見例子，不是五套固定 preset；實際工具仍以目標專案既有選擇為優先。
+
+| 技術棧 | 常見工具 | 主要驗證項目 |
+| --- | --- | --- |
+| Java | JDK、Maven／Gradle Wrapper、Spotless／Checkstyle、JUnit | 格式與風格、編譯器警告、編譯、測試、封裝 |
+| Go | Go toolchain、`gofmt`、`go vet`、`go test`、`go build` | 格式、可疑程式結構、測試、建置 |
+| C++ | GCC／Clang／MSVC、CMake、clang-format、clang-tidy、CTest | 格式、靜態分析、編譯、測試 |
+| C# | .NET SDK、`dotnet format`、Roslyn analyzers、`dotnet build`、`dotnet test` | 格式與 analyzer、編譯、測試 |
+| NestJS／TypeScript | Node.js、專案既有 package manager、ESLint、Prettier、TypeScript／Nest CLI、Jest／Supertest | 格式、lint、型別檢查、單元／整合測試、建置 |
+
+目前 Repository 內的 Java 範例以 Maven `verify` 一次執行 Spotless 格式檢查、以 `javac -Xlint:all -Werror` 編譯 main／test、全部測試與應用程式封裝；實際設定見 [`pom.xml`](examples/spring-boot/pom.xml)。
+
+## GitHub CI
+
+Pull Request 與 `main` 更新時，[GitHub Actions](.github/workflows/spring-boot.yml) 會在 Ubuntu／Temurin 25 上重跑同一條 Maven `verify`。它提供獨立環境的重驗證，不是另一套測試流程。
 
 ## 第三方來源
 
