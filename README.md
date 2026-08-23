@@ -7,7 +7,7 @@
 ## 設計重點
 
 - **Spec 是共同契約**：需求、實作、測試與 Review 對照同一份可驗收的產品行為。
-- **階段責任分開**：[`AGENTS.md`](AGENTS.md) 負責路由，Skills 分別處理 Spec、setup、implementation 與 review。
+- **階段責任分開**：root [`AGENTS.md`](AGENTS.md) 是唯一的跨階段 Router；Stage Skills 回報結果，Support Skills 只提供階段內方法。
 - **按需載入規則**：只在任務需要時讀取對應 Skill，避免無關指令占用上下文。
 - **框架與技術棧分離**：語言與建置工具放在各自的 `examples/<project>/`，不進入框架規則。
 - **交付結果可追蹤**：同一個 Feature Branch 與 Pull Request 完成驗證、Review、CI 與 Merge。
@@ -18,24 +18,25 @@
 
 ```mermaid
 flowchart TD
-    A["產品需求或變更"] --> B["write-spec<br/>建立或更新 Spec"]
+    A["產品需求或變更"] --> R["root Router<br/>判斷目前階段"]
+    R --> B["write-spec<br/>建立或更新 Spec"]
     B --> C["可實作、可驗收的 Spec"]
     C --> D{"缺少 build/test 基線？"}
     D -->|"是"| E["prepare-project"]
     D -->|"否"| F["implement-spec"]
     E --> F
     F --> G["實作與測試"]
-    G --> H["本機驗證"]
-    H --> I["review-implementation<br/>Implementation + Test Review"]
-    I --> J{"實作與測試符合 Spec？"}
-    J -->|"是"| K["Git 交付"]
-    J -->|"否"| L{"問題屬於哪一階段？"}
-    L -->|"Spec"| B
-    L -->|"setup"| E
-    L -->|"產品碼或測試"| F
+    G --> H["Commit"]
+    H --> I["本機 Validation<br/>committed Head"]
+    I --> J["review-implementation<br/>Implementation + Test Review"]
+    J --> K{"實作與測試符合 Spec？"}
+    K -->|"是"| L["Push → PR → Required CI"]
+    L -->|"條件成立"| M["Merge"]
+    L -->|"PR review／CI finding"| R
+    K -->|"否／finding"| R
 ```
 
-如果只是準備環境或補齊 build/test，不另外建立產品 Spec。以明確的 setup task 為準，流程是 `prepare-project → 本機驗證 → review-implementation`。
+如果只是準備環境或補齊 build/test，不另外建立產品 Spec。以明確的 setup task 為準，流程是 `prepare-project → Commit → 本機 Validation → review-implementation → Git 交付`；finding 同樣交回 root Router 分類。
 
 ### 執行模式
 
@@ -73,9 +74,11 @@ flowchart LR
 | `write-spec` | 寫清楚要做什麼，以及怎樣算完成。 |
 | `prepare-project` | 補齊可重現的 build/test 環境。 |
 | `implement-spec` | 依 Spec 完成產品碼與測試。 |
-| `review-implementation` | 獨立檢查實作與測試，提出 findings 並給出 verdict。 |
+| `review-implementation` | 分別從 Implementation／Test 兩個視角檢查 committed Head，提出 findings 並給出 verdict。 |
 
-支援 Skills `grilling`、`tdd`、`codebase-design` 保留上游原文；來源與授權見 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)。
+Stage Skills 只完成所屬階段、回報結果與證據，再由 root Router 重判下一步；Support Skills `grilling`、`tdd`、`codebase-design` 只提供階段內方法。
+
+`grilling`、`codebase-design`、`tdd/tests.md` 與 `tdd/mocking.md` 保留上游內容；`tdd/SKILL.md` 與 metadata 基於上游版本調整 approval、stage ownership 與流程邊界。來源與授權見 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)。
 
 ## Repository 結構
 

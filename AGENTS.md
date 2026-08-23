@@ -10,7 +10,7 @@
 
 ```text
 目前執行模式：{{MODE_NO}} — {{MODE_ZH}}（{{MODE_EN}}）
-1 — 逐步確認（supervised）
+1 — 逐步確認（supervised）：遇到未決事項時逐步詢問使用者。
 2 — 全自動（autonomous）：自動完成 Commit、Push、PR、CI 驗證與符合條件後 Merge；只有硬阻塞或使用者明確排除的操作才停止。
 切換方式：「切換到 1／2」、「切換到逐步確認／全自動」或「switch to supervised／autonomous」。
 ```
@@ -19,18 +19,27 @@
 
 ## Router
 
+Root `AGENTS.md` 是唯一的跨階段 Router。只有 Router 能選擇下一個 lifecycle stage；Stage Skill 只完成目前階段、回報結果與證據，再交回 Router。Agent 在每個 Stage Skill 返回後重新依本節判斷，直到完成交付或遇到硬阻塞。
+
+Support Skill（`grilling`、`tdd`、`codebase-design`）只提供目前階段內的方法，不能取代 Stage Skill 或決定下一階段。
+
 | 情況 | 使用 Skill |
 | --- | --- |
-| 新需求的公開行為、驗收條件或重要邊界未定 | `$write-spec` |
-| 目前交付缺少可重現的 build/test 基線 | `$prepare-project` |
-| Spec 已確認，需要實作或修正產品碼／測試 | `$implement-spec` |
-| 實作或 setup 已完成驗證，需要交付判定 | `$review-implementation` |
+| 純 setup task 缺少可重現的 build/test 基線或有 setup finding | `$prepare-project`；不建立產品 Spec |
+| 產品需求的公開行為、驗收條件或重要邊界未定，或有 Spec finding | `$write-spec` |
+| Spec 已成立但缺少可重現的 build/test 基線或有 setup finding | `$prepare-project` |
+| Spec 與基線已成立，需要實作、修正產品碼／測試或處理 implementation／test finding | `$implement-spec` |
+| Candidate 已提交，且該 Head 已完成適用驗證 | `$review-implementation` |
 
-一般產品流程：`write-spec →（必要時 prepare-project）→ implement-spec → validation → review-implementation`
+「Spec 已成立」在 supervised 模式代表使用者已確認；在 autonomous 模式代表 Agent 已定稿，並記錄 Agent 已採用且影響契約的假設。只有沒有合理判斷依據時才依既有硬阻塞停止。
 
-純 setup 流程：`prepare-project → validation → review-implementation`
+`validation` 不是獨立 Skill：Stage 內只執行受影響檢查；Candidate Commit 後由 Router 對 committed Head 執行一次完整且適用的交付檢查。
 
-Review finding 依責任交回：Spec → `write-spec`；setup → `prepare-project`；產品碼／測試 → `implement-spec`。修正後重新驗證並重做兩個 Review 視角。
+一般產品流程：`write-spec →（必要時 prepare-project）→ implement-spec → Commit → validation → review-implementation → PASS：Push → PR → Required CI → Merge`
+
+純 setup 流程：`prepare-project → Commit → validation → review-implementation → Git 交付`
+
+Review、PR review 或 CI finding 由 Router 依責任分流：Spec → `write-spec`；setup → `prepare-project`；產品碼／測試 → `implement-spec`。任何修正產生新 Commit 後，都要對新 Head 重新執行完整適用驗證，並重做 Implementation Review 與 Test Review；只有 Review PASS 後才能 Push、建立 PR、驗證 Required CI 與在符合條件後 Merge。
 
 純文件或簡單設定只做風險相稱的驗證；TDD 只用於可測產品行為，Codebase Design 只用於 coding／refactor。
 
