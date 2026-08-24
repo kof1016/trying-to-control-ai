@@ -1,4 +1,12 @@
 target/
+node_modules/
+dist/
+coverage/
+
+# Go build and test output
+*.exe
+*.test
+*.out
 
 # IDEs
 .idea/

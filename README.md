@@ -1,212 +1,201 @@
-# AI-SDLC Demo
+# Trying to Control AI
 
-> 讓 AI 不只產生程式碼，而是在可驗收契約、階段責任與交付證據下，從模糊需求走到可驗證交付。
+> 我試著控制 AI——不是限制它思考，而是讓它先跟你一起理清規格與功能邊界，再開始寫程式。
 
-這個 Demo 處理的不是「AI 會不會寫程式」，而是「如何讓 AI 在工程流程中可靠地完成工作」。使用者可以只描述需求；AI 先釐清會改變產品契約的決策，再依同一份 Spec 完成實作、測試、Review 與 Git 交付。
+AI 寫得很快；真正讓人崩潰的，往往不是它完全做錯，而是它做得比你要求更多：
 
-這不是另一組 Prompt，而是把需求管理、責任分工、品質 Gate 與變更追蹤落成 Repository 規則。AI 可以提高自主程度，但驗收標準與交付證據不會因此消失。
+- 自行補上沒有說出口的假設。
+- 順手增加功能，或為想像中的擴充性多做幾層架構。
+- 程式能跑、測試也通過，人卻還是不確定這是不是自己真正要的。
 
-## 30 秒看懂
+這個 Demo 把 AI 的推理能力放在更前面：先一起把需求、功能邊界與驗收方式說清楚，再讓同一份 Spec 帶著後續工作往下走。
 
-- **Spec 是追問出來的**：AI 先從 Repository、測試與文件確認既有事實，只把會影響外部行為、驗收條件或重要邊界的決策交給使用者，或在全自動模式中依證據決定並記錄假設。
-- **流程由 Agent 控制**：root [`AGENTS.md`](AGENTS.md) 是唯一的跨階段 Router。每個 Stage Skill 完成後只回報結果，Agent 再依目前狀態決定下一步。
-- **Skill 只提供階段內方法**：Stage Skills 負責一個生命週期階段；Support Skills 提供追問、TDD 或設計方法，不會自行串接下一個 Stage。
-- **交付以證據為準**：最終 Validation 與 Review 對準乾淨的 committed Head；Push、PR、CI 與 Merge 都有明確 Gate。
+**整套工作流沒有另外用腳本控制流程。**
 
-## 控制模型：Agent 決策，Skill 執行後返回
+我用單一職責切分能力與階段，再由 AI 根據目前結果判斷下一步。
+
+信任不是要 AI 保證不犯錯，而是讓影響產品的決定與最後如何驗收，都能被看見。
+
+## 從一句「做一個 A＋B API」開始
+
+定出規格並不簡單。即使只是 A＋B，真正問下去，才會發現需求和想像往往有落差。
+
+![AI 釐清 A＋B API 需求的對話：先確認技術棧與資料型別，再追問呼叫方式、回傳格式與功能邊界](./docs/assets/readme/spec-clarification.gif)
+
+*這段對話只示範需求如何被問清楚；畫面中的選擇不代表目前專案功能或契約。*
+
+<details>
+<summary>停下來看兩輪追問</summary>
+
+**第一輪：從技術棧與資料型別，問到呼叫方式、回傳格式與整數範圍。**
+
+[![第一輪需求追問：AI 提出呼叫方式、回傳格式與整數範圍的問題和建議](./docs/assets/readme/spec-clarification-step-1.png)](./docs/assets/readme/spec-clarification-step-1.png)
+
+**第二輪：根據前一輪的選擇，繼續確認請求格式與存取控制。**
+
+[![第二輪需求追問：AI 根據使用者的選擇，繼續確認 POST 請求格式與存取控制](./docs/assets/readme/spec-clarification-step-2.png)](./docs/assets/readme/spec-clarification-step-2.png)
+
+</details>
+
+## 這套流程怎麼運作
+
+前面的追問會收斂成 Spec，成為後續實作、測試與 Review 的共同依據。
 
 ```mermaid
-flowchart TD
-    I["需求／Repository 現況"] --> R["Agent<br/>依 Root AGENTS.md 判斷下一步"]
-    R -->|"需要階段工作"| S["執行一個 Stage Skill"]
-    S --> O["只回報結果、證據或 finding"]
-    O --> R
-    R -->|"需要交付檢查"| G["執行一個 Git／品質 Gate"]
-    G --> Q["回報 Gate 結果或 finding"]
-    Q --> R
-    R -->|"所有交付條件成立"| M["Merge"]
-    H["Support Skills<br/>grilling · tdd · codebase-design"] -. "階段內按需載入" .-> S
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "fontFamily": "Microsoft JhengHei, Noto Sans TC, Arial, sans-serif",
+    "lineColor": "#2563EB",
+    "textColor": "#0F172A",
+    "edgeLabelBackground": "#F8FAFC"
+  },
+  "flowchart": {
+    "curve": "stepAfter",
+    "nodeSpacing": 42,
+    "rankSpacing": 48
+  }
+}}%%
+flowchart TB
+    S([需求釐清與 Spec 確認]):::start --> I["以 TDD 實作<br/>失敗測試 → 最小實作 → 重複"]:::step
+    E["需要時：準備開發與測試工具"]:::optional -.-> I
+
+    I --> IR{"Implementation Review<br/>實作符合 Spec？"}:::review
+    I --> TR{"Test Review<br/>測試足以驗收 Spec？"}:::review
+
+    IR -->|是| OK["兩種 Review 均通過"]:::passed
+    TR -->|是| OK
+    IR -->|否：修正| I
+    TR -->|否：修正| I
+
+    OK --> D([交付]):::delivery
+
+    classDef start fill:#F8FAFC,stroke:#475569,color:#0F172A,stroke-width:2px;
+    classDef optional fill:#F1F5F9,stroke:#94A3B8,color:#334155,stroke-width:1.5px,stroke-dasharray:5 4;
+    classDef step fill:#EFF6FF,stroke:#2563EB,color:#172554,stroke-width:2px;
+    classDef review fill:#FFFBEB,stroke:#D97706,color:#78350F,stroke-width:2px;
+    classDef passed fill:#ECFDF5,stroke:#059669,color:#064E3B,stroke-width:2px;
+    classDef delivery fill:#ECFDF5,stroke:#059669,color:#064E3B,stroke-width:2px;
+
+    linkStyle default stroke:#2563EB,stroke-width:2px;
+    linkStyle 1 stroke:#94A3B8,stroke-width:1.5px;
+    linkStyle 6,7 stroke:#DC2626,stroke-width:2.5px;
 ```
 
-`AGENTS.md` 不是額外的 Runtime、狀態機或流程腳本，而是 Agent 的路由規則。Agent 每次收到 Stage 結果後，都以 Repository 當下可觀察的契約、程式碼與交付證據重新判斷下一步。
+可測的產品行為會在實作階段以 TDD 的小循環逐步完成。兩種 Review 都通過才進入交付；紅色實線代表實際的修正路徑。修正後會重新執行適用檢查，並重做兩種 Review。
 
-之所以能分階段，是因為每個階段都有清楚的**觸發條件、責任、完成結果與驗證條件**；Agent 不需要另外持久化「流程走到哪裡」。
+### 對應的 Skill
 
-## Spec 如何從需求產生
+| 工作 | Skill |
+| --- | --- |
+| 釐清需求並確認 Spec | `write-spec` |
+| 按需準備開發與測試工具 | `prepare-project` |
+| 依 Spec 以 TDD 實作 | `implement-spec` |
+| Implementation／Test Review | `review-implementation` |
 
-使用者不必先寫好 Spec。`write-spec` 會載入 `grilling`，以 design tree 排出契約決策的前置關係，再從目前可回答的 frontier 逐步收斂。既有程式、測試、文件或可信來源已能回答的現況，由 AI 自行確認，不轉嫁成問題。
+## 每一步都能被檢查
 
-下面的參與者代表同一個 Agent 在不同責任下的行為，不是彼此呼叫的額外服務。
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor U as 使用者
-    participant R as Agent（依 Root AGENTS.md）
-    participant W as 同一 Agent／Spec 階段
-
-    U->>R: 描述需求，不必先寫 Spec
-    R->>W: 進入 write-spec
-    W->>W: 讀取 Repository，按需載入 grilling
-    W->>W: 建立 design tree，找出目前 frontier
-    loop frontier 仍有未決的契約決策
-        W->>W: 從 Repository／文件確認既有事實與限制
-        alt 逐步確認 supervised
-            W->>U: 詢問會影響產品契約的決策，附建議
-            U-->>W: 確認產品決策
-        else 全自動 autonomous
-            W->>W: 依證據決定並記錄契約假設
-        end
-    end
-    W-->>R: 回報可驗收 Spec、假設或 blocker
-```
-
-`design tree` 用來管理決策依賴；`frontier` 是前置條件已成立、此刻真正需要處理的決策。這讓追問集中在產品契約，而不是一次丟出大量問題或提前鎖死實作細節。
-
-例如 Java 版本與測試命令可直接從 Repository 確認；非法輸入要回 `400` 還是 `422`，才是需要詢問或在 autonomous 模式中明示假設的契約決策。
-
-## Agent 與 Skills 的責任邊界
-
-| 元件 | 責任 | 不負責 |
+| 階段 | 留下的內容 | 它回答的問題 |
 | --- | --- | --- |
-| Agent（依 Root `AGENTS.md`） | 讀取目前狀態、選擇下一階段、分類 findings、執行 Git 交付 Gate | 不把跨階段控制交給 Skill |
-| Stage Skill | 完成一個階段，回報結果、證據與 blocker | 不啟動下一個 Stage |
-| Support Skill | 提供目前階段需要的方法 | 不決定生命週期與交付順序 |
+| Spec | 產品行為、輸入邊界與驗收條件 | AI 理解的是不是使用者要的？ |
+| 實作與測試 | 產品程式碼與可執行的驗收測試 | 實際做了什麼，又如何證明？ |
+| 兩種 Review | 實作與測試各自的審查結果 | 有沒有越界？測試真的驗得到嗎？ |
+| 交付 | 明確版本與完整檢查結果 | 最後交付的是哪個版本？ |
 
-### Stage Skills
+## 如何使用
 
-| Skill | 單一責任 |
-| --- | --- |
-| `write-spec` | 把需求與 Spec finding 整理成可實作、可驗收的產品契約。 |
-| `prepare-project` | 建立目前交付需要的最小、可重現 build/test 基線。 |
-| `implement-spec` | 依已成立的 Spec，以可驗收切片與 TDD 完成產品碼及測試。 |
-| `review-implementation` | 對精確 committed Head 分別執行 Implementation Review 與 Test Review，輸出 verdict 與 findings。 |
-
-### Support Skills
-
-| Skill | 階段內用途 |
-| --- | --- |
-| `grilling` | 用 design tree／frontier 釐清真正需要決定的產品問題。 |
-| `tdd` | 提供 Red → Green、public test seam、測試品質與 mocking 準則。 |
-| `codebase-design` | 提供 module、interface、seam 與責任配置的設計方法。 |
-
-通用 Skill 的精煉原則是：**保留核心方法、移除跨階段控制、對齊 supervised／autonomous 模式、縮小成單一責任，並按需載入**。因此方法可以重用，生命週期仍由 Repository 的 Router 管理。
-
-## 交付 Gate：從 Commit 到 Merge
-
-```mermaid
-sequenceDiagram
-    autonumber
-    participant R as Agent（依 Root AGENTS.md）
-    participant S as review-implementation
-    participant G as Git／GitHub
-    participant C as Required CI
-
-    R->>G: Commit implementation／test
-    R->>R: 驗證乾淨的 committed Head
-    R->>S: 執行 Implementation／Test Review
-    S-->>R: 回報 verdict 與 findings
-    alt blocking finding 或 FAIL
-        R->>R: 分類到 Spec／setup／implementation／test
-    else Review PASS
-        R->>G: Push 並建立 Pull Request
-        G->>C: 執行 Required CI
-        C-->>R: 回報 CI 結果
-        alt CI 失敗或 Head 改變
-            R->>R: 回到 Router，對新 Head 重跑適用 Gate
-        else 所有合併條件成立
-            R->>G: Merge
-        end
-    end
-```
-
-完整證據鏈是：
-
-`Spec → implementation／test → Commit → committed-Head Validation → Implementation／Test Review → Push → PR → CI → Merge`
-
-Review、PR review 或 CI 的 blocking finding 一律回到 Root Router，由它依責任分流到 Spec、setup、implementation 或 test。任何新 Commit，或 Merge 前整合更新後的 `main`，都會形成新 Head，先前證據不能直接沿用。
-
-## 實際 Demo 證據
-
-Spring Boot 範例已用完整交付閉環完成一個最小產品功能：任意大小十進位整數的加法 API。
-
-| 證據 | 結果 |
-| --- | --- |
-| 產品契約 | [`specs/addition-api.md`](specs/addition-api.md) 定義公開行為、邊界、錯誤與非目標。 |
-| 實作與測試 | [`AdditionController.java`](examples/spring-boot/src/main/java/com/github/kof1016/aiworkflowdemo/AdditionController.java) 與 [`AdditionApiTests.java`](examples/spring-boot/src/test/java/com/github/kof1016/aiworkflowdemo/AdditionApiTests.java)。 |
-| Review | Implementation Review 與 Test Review 都為 PASS；保留一項未阻擋交付的未來 JDK 相容性提醒。 |
-| PR／CI | [PR #12](https://github.com/kof1016/ai-work-flow-demo/pull/12) 完成 11 項測試；[Spring Boot CI run #11](https://github.com/kof1016/ai-work-flow-demo/actions/runs/32611234214) 通過。 |
-| Merge | 合併至 `main`：[`25681d6`](https://github.com/kof1016/ai-work-flow-demo/commit/25681d6bf9568aeb9d8ca113975988ed5fef13b4)。 |
-
-這些連結提供可追溯證據，但不代表此 Demo 已經過大規模或長期生產驗證。
-
-## 執行模式
-
-| 編號 | 模式 | 契約決策 | 交付行為 |
-| --- | --- | --- | --- |
-| 1 | 逐步確認（supervised） | 依 frontier 分輪詢問，使用者確認後 Spec 才成立；未指定時使用此模式。 | 依目前任務與已確認決策繼續執行。 |
-| 2 | 全自動（autonomous） | 使用同一套 design tree／frontier 作為內部推理，依證據定稿並記錄影響契約的假設。 | 自動完成 Commit、Push、PR、CI 驗證與符合條件後 Merge；只有硬阻塞或明確排除才停止。 |
-
-模式改變的是決策與自動化程度，不會省略適用的 Spec、TDD、Validation 或 Review。可用「切換到逐步確認／全自動」或 `switch to supervised/autonomous` 切換目前任務。
-
-## 最短使用方式
-
-把需求直接交給支援 Repository 規則與 Skills 的 coding Agent；不需要先代替 AI 撰寫 Spec。
+把自然語言需求交給支援 Repository 規則與 Skills 的 coding Agent：
 
 ```text
-請先讀取 AGENTS.md 與 CONVERSATION_RULES.md，切換到全自動模式，
+請先讀取 AGENTS.md 與 CONVERSATION_RULES.md，
 依 Repository 規則完成以下需求：
 
 <用自然語言描述需求>
 ```
 
-若希望逐項確認產品決策，把「全自動模式」改成「逐步確認模式」。
+預設採逐步確認：AI 提出問題與建議，重要決策由使用者確認後再繼續。
 
 ## Repository 結構
 
+工作流不綁定技術棧；同一份 A＋B Spec 目前由 Spring Boot、Go Gin 與 NestJS 三個可獨立執行的範例實作，用來確認契約與驗收方式可以跨技術棧保持一致。
+
 ```text
-.agents/skills/           Repository-scoped Skills
-  write-spec/             產生可驗收 Spec
-  prepare-project/        建立 build/test 基線
-  implement-spec/         依 Spec 實作與測試
-  review-implementation/  Implementation／Test Review
-  grilling/               需求追問方法
-  tdd/                    TDD 與測試方法
-  codebase-design/        Codebase 設計方法
-.github/                  PR template 與 CI
-examples/
-  spring-boot/            可執行的 Spring Boot Demo
-specs/                    目前產品行為契約
-AGENTS.md                 唯一的跨階段 Router 規則
-CONVERSATION_RULES.md     對話與回覆規則
-THIRD_PARTY_NOTICES.md    第三方來源與授權
+.
+├── .agents/
+│   └── skills/
+│       ├── write-spec/             釐清並產生可驗收的 Spec
+│       ├── prepare-project/        按需準備開發與測試工具
+│       ├── implement-spec/         依 Spec 實作產品與測試
+│       ├── review-implementation/  Implementation／Test Review
+│       ├── grilling/               需求追問方法
+│       ├── tdd/                    TDD 方法
+│       └── codebase-design/        Codebase 設計方法
+├── .github/
+│   ├── pull_request_template.md    交付與 Review 紀錄格式
+│   └── workflows/
+│       ├── spring-boot.yml         Spring Boot CI
+│       ├── go-gin.yml              Go Gin CI
+│       └── nestjs.yml              NestJS CI
+├── docs/
+│   └── assets/readme/              README 示範圖
+├── examples/
+│   ├── spring-boot/                Java 25／Spring Boot 範例
+│   ├── go-gin/                     Go 1.27.0／Gin 1.12.0 範例
+│   └── nestjs/                     Node.js 26.7.0／TypeScript 7.0.2／NestJS 11.2.1 範例
+├── specs/
+│   └── addition-api.md             三個範例共用的 A＋B 產品契約
+├── AGENTS.md                       工作流與交付規則
+├── CONVERSATION_RULES.md           對話與回覆規則
+└── THIRD_PARTY_NOTICES.md          第三方來源與授權
 ```
 
-## Spring Boot 範例
+<details>
+<summary>執行 A＋B 範例</summary>
 
-[`examples/spring-boot/`](examples/spring-boot/) 是這套流程的可執行驗證載體，使用 Java 25 與 Maven Wrapper，提供具明確契約、錯誤邊界與自動測試的 `GET /add` API。
+三個範例都提供 `GET /add?a=1&b=2`，成功時回傳：
 
-進入 `examples/spring-boot/` 後驗證：
+```json
+{"result":"3"}
+```
+
+完整輸入格式、任意大小整數與錯誤行為見 [`specs/addition-api.md`](specs/addition-api.md)。各範例的完整驗證命令如下。
+
+Spring Boot（Java 25）：
 
 ```bash
+cd examples/spring-boot
 ./mvnw --batch-mode --no-transfer-progress verify
 ```
 
-啟動並呼叫 API：
+Windows 使用 `mvnw.cmd`。
+
+Go Gin（Go 1.27.0、Gin 1.12.0）：
 
 ```bash
-./mvnw spring-boot:run
-curl "http://localhost:8080/add?a=1&b=2"
-# {"result":"3"}
+cd examples/go-gin
+go test ./...
+go build ./...
 ```
 
-Windows 使用 `mvnw.cmd`。[GitHub Actions](.github/workflows/spring-boot.yml) 會在 Pull Request 與 `main` 更新時執行相同的 Maven 驗證。
+NestJS（Node.js 26.7.0、TypeScript 7.0.2、NestJS 11.2.1、Jest 30.4.2）：
 
-## 移植到實際專案
+```bash
+cd examples/nestjs
+npm ci
+npm run verify
+```
 
-可移植的是控制觀念，而不是 Spring Boot 範例本身：保留 Spec 契約、Router／Skill 邊界、committed-Head 證據與 finding 回流，再替換實際專案的技術棧、build/test 命令、品質 Gate、CI 與團隊治理規則。
+Jest 透過 SWC 直接執行 TypeScript 測試；`tsc --noEmit` 另行負責型別檢查，不會產生測試用 JavaScript 檔。
 
-這是一個用來驗證設計的 Demo，不宣稱是成熟框架，也不宣稱已經過大規模生產環境驗證。
+</details>
+
+## 需要時，AI 也會準備開發與測試工具
+
+若目標專案還不能穩定建置或測試，AI 會沿用既有技術棧，依目前需求補齊最少必要的設定、依賴與命令，讓格式、lint／靜態分析、型別／編譯、單元／整合測試與建置可以重複執行。實際項目由專案需求決定；已有適用工具時不會另建一套。
+
+## GitHub CI
+
+Pull Request 與 `main` 更新時，[GitHub Actions](.github/workflows/) 會分別以 Java 25、Go 1.27.0 與 Node.js 26.7.0 重跑三個範例定義的完整檢查，其中包含測試。CI 是對同一套本機檢查的重驗證，不是另一套測試流程。
 
 ## 第三方來源
 
