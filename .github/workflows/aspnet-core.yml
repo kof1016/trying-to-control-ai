@@ -1,0 +1,43 @@
+name: ASP.NET Core
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aspnet-core-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: .NET 10 / format and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "10.0.x"
+          cache: true
+          cache-dependency-path: examples/aspnet-core/**/packages.lock.json
+
+      - name: Restore ASP.NET Core example
+        working-directory: examples/aspnet-core
+        run: dotnet restore AspNetCore.slnx --locked-mode
+
+      - name: Check formatting
+        working-directory: examples/aspnet-core
+        run: dotnet format AspNetCore.slnx --no-restore --verify-no-changes
+
+      - name: Test ASP.NET Core example
+        working-directory: examples/aspnet-core
+        run: dotnet test AspNetCore.slnx --no-restore --configuration Release
