@@ -117,7 +117,7 @@ flowchart TB
 
 ## Repository 結構
 
-工作流不綁定技術棧；`examples/spring-boot/` 只是目前的可執行示範專案，可以換成其他語言或框架。
+工作流不綁定技術棧；同一份 A＋B Spec 目前由 Spring Boot、Go Gin 與 NestJS 三個可獨立執行的範例實作，用來確認契約與驗收方式可以跨技術棧保持一致。
 
 ```text
 .
@@ -133,26 +133,59 @@ flowchart TB
 ├── .github/
 │   ├── pull_request_template.md    交付與 Review 紀錄格式
 │   └── workflows/
-│       └── spring-boot.yml         示範專案的 GitHub Actions CI
+│       ├── spring-boot.yml         Spring Boot CI
+│       ├── go-gin.yml              Go Gin CI
+│       └── nestjs.yml              NestJS CI
 ├── docs/
 │   └── assets/readme/              README 示範圖
 ├── examples/
-│   └── spring-boot/                可執行的示範專案，可替換技術棧
+│   ├── spring-boot/                Java 25／Spring Boot 範例
+│   ├── go-gin/                     Go 1.27.0／Gin 1.12.0 範例
+│   └── nestjs/                     Node.js 26.7.0／TypeScript 7.0.2／NestJS 11.2.1 範例
+├── specs/
+│   └── addition-api.md             三個範例共用的 A＋B 產品契約
 ├── AGENTS.md                       工作流與交付規則
 ├── CONVERSATION_RULES.md           對話與回覆規則
 └── THIRD_PARTY_NOTICES.md          第三方來源與授權
 ```
 
 <details>
-<summary>執行目前的示範專案</summary>
+<summary>執行 A＋B 範例</summary>
 
-目前的示範專案使用 Java 25。進入 `examples/spring-boot/` 後執行：
+三個範例都提供 `GET /add?a=1&b=2`，成功時回傳：
+
+```json
+{"result":"3"}
+```
+
+完整輸入格式、任意大小整數與錯誤行為見 [`specs/addition-api.md`](specs/addition-api.md)。各範例的完整驗證命令如下。
+
+Spring Boot（Java 25）：
 
 ```bash
+cd examples/spring-boot
 ./mvnw --batch-mode --no-transfer-progress verify
 ```
 
 Windows 使用 `mvnw.cmd`。
+
+Go Gin（Go 1.27.0、Gin 1.12.0）：
+
+```bash
+cd examples/go-gin
+go test ./...
+go build ./...
+```
+
+NestJS（Node.js 26.7.0、TypeScript 7.0.2、NestJS 11.2.1、Jest 30.4.2）：
+
+```bash
+cd examples/nestjs
+npm ci
+npm run verify
+```
+
+Jest 透過 SWC 直接執行 TypeScript 測試；`tsc --noEmit` 另行負責型別檢查，不會產生測試用 JavaScript 檔。
 
 </details>
 
@@ -162,7 +195,7 @@ Windows 使用 `mvnw.cmd`。
 
 ## GitHub CI
 
-Pull Request 與 `main` 更新時，[GitHub Actions](.github/workflows/spring-boot.yml) 會在獨立環境重跑示範專案定義的完整檢查，其中包含測試。CI 是對同一套檢查的重驗證，不是另一套測試流程。
+Pull Request 與 `main` 更新時，[GitHub Actions](.github/workflows/) 會分別以 Java 25、Go 1.27.0 與 Node.js 26.7.0 重跑三個範例定義的完整檢查，其中包含測試。CI 是對同一套本機檢查的重驗證，不是另一套測試流程。
 
 ## 第三方來源
 

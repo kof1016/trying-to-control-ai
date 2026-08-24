@@ -12,7 +12,7 @@
 	<artifactId>ai-work-flow-demo-spring-boot</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ai-work-flow-demo-spring-boot</name>
-	<description>Minimal Spring Boot shell for the AI-SDLC demo</description>
+	<description>Spring Boot integer addition API example for the AI-SDLC demo</description>
 	<properties>
 		<java.version>25</java.version>
 		<spotless.version>3.9.0</spotless.version>

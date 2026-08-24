@@ -1,0 +1,42 @@
+name: Go Gin
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: go-gin-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Go 1.27 / test and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: "1.27.0"
+          cache-dependency-path: examples/go-gin/go.sum
+
+      - name: Check formatting
+        working-directory: examples/go-gin
+        run: test -z "$(gofmt -l .)"
+
+      - name: Test Go Gin example
+        working-directory: examples/go-gin
+        run: go test ./...
+
+      - name: Build Go Gin example
+        working-directory: examples/go-gin
+        run: go build ./...

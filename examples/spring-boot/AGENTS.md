@@ -1,4 +1,4 @@
-# Spring Boot Shell 規則
+# Spring Boot 範例規則
 
 本檔只補充 `examples/spring-boot/`；root `AGENTS.md` 仍然適用。
 

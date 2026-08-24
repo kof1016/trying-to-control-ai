@@ -1,0 +1,39 @@
+name: NestJS
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nestjs-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Node.js 26.7.0 / npm verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "26.7.0"
+          cache: npm
+          cache-dependency-path: examples/nestjs/package-lock.json
+
+      - name: Install dependencies
+        working-directory: examples/nestjs
+        run: npm ci
+
+      - name: Verify NestJS example
+        working-directory: examples/nestjs
+        run: npm run verify

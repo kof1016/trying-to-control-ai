@@ -31,6 +31,6 @@ jobs:
           cache: maven
           cache-dependency-path: examples/spring-boot/pom.xml
 
-      - name: Verify Spring Boot shell
+      - name: Verify Spring Boot example
         working-directory: examples/spring-boot
         run: ./mvnw --batch-mode --no-transfer-progress verify
