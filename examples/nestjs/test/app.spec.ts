@@ -31,7 +31,7 @@ describe('addition API', () => {
     expect(response.body).toEqual({ result: '3' });
   });
 
-  it('adds arbitrarily large signed integers and returns a canonical result', async () => {
+  it('adds signed integers beyond machine range and returns a canonical result', async () => {
     const response = await request(app.getHttpServer())
       .get('/add')
       .query({
@@ -51,6 +51,29 @@ describe('addition API', () => {
 
     expect(response.body).toEqual({ result: '0' });
   });
+
+  it('accepts signed 1,000-digit operands and returns a 1,001-digit result', async () => {
+    const operand = `+${'9'.repeat(1000)}`;
+    const response = await request(app.getHttpServer())
+      .get('/add')
+      .query({ a: operand, b: operand })
+      .expect(200);
+
+    expect(response.body).toEqual({ result: `1${'9'.repeat(999)}8` });
+  });
+
+  it.each([
+    { parameter: 'a', a: `${'0'.repeat(1000)}1`, b: '1' },
+    { parameter: 'b', a: '1', b: `${'0'.repeat(1000)}1` },
+  ])(
+    'rejects a 1,001-digit $parameter operand when leading zeros exceed the limit',
+    async ({ a, b }) => {
+      await request(app.getHttpServer())
+        .get('/add')
+        .query({ a, b })
+        .expect(400);
+    },
+  );
 
   it.each(['', '1.0', '1e3', ' 1', '1 ', '١'])(
     'rejects invalid value %j for either parameter',

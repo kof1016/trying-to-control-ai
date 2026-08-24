@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 )
 
@@ -69,7 +70,7 @@ func TestRejectsMissingParameters(t *testing.T) {
 	}
 }
 
-func TestAddsArbitrarilyLargeSignedIntegersAndReturnsCanonicalResult(t *testing.T) {
+func TestAddsSignedIntegersBeyondMachineRangeAndReturnsCanonicalResult(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, "/add?a=%2B0009223372036854775808&b=-9223372036854775807", nil)
 	response := httptest.NewRecorder()
 
@@ -79,6 +80,41 @@ func TestAddsArbitrarilyLargeSignedIntegersAndReturnsCanonicalResult(t *testing.
 		t.Fatalf("expected status %d, got %d", http.StatusOK, response.Code)
 	}
 	if response.Body.String() != "{\"result\":\"1\"}" {
-		t.Fatalf("expected canonical arbitrary-precision result, got %s", response.Body.String())
+		t.Fatalf("expected canonical exact result beyond machine range, got %s", response.Body.String())
+	}
+}
+
+func TestRejectsOperandsWithMoreThan1000Digits(t *testing.T) {
+	tooLong := "0" + strings.Repeat("9", 1000)
+	for _, parameter := range []string{"a", "b"} {
+		query := url.Values{"a": {"1"}, "b": {"1"}}
+		query.Set(parameter, tooLong)
+		request := httptest.NewRequest(http.MethodGet, "/add?"+query.Encode(), nil)
+		response := httptest.NewRecorder()
+
+		newRouter().ServeHTTP(response, request)
+
+		if response.Code != http.StatusBadRequest {
+			t.Errorf("expected a 1001-digit %s operand to return %d, got %d", parameter, http.StatusBadRequest, response.Code)
+		}
+	}
+}
+
+func TestAdds1000DigitOperandsAndReturns1001DigitResult(t *testing.T) {
+	query := url.Values{
+		"a": {"+" + strings.Repeat("9", 1000)},
+		"b": {strings.Repeat("0", 999) + "1"},
+	}
+	request := httptest.NewRequest(http.MethodGet, "/add?"+query.Encode(), nil)
+	response := httptest.NewRecorder()
+
+	newRouter().ServeHTTP(response, request)
+
+	if response.Code != http.StatusOK {
+		t.Fatalf("expected status %d, got %d", http.StatusOK, response.Code)
+	}
+	expectedBody := "{\"result\":\"1" + strings.Repeat("0", 1000) + "\"}"
+	if response.Body.String() != expectedBody {
+		t.Fatalf("expected exact 1001-digit result, got %s", response.Body.String())
 	}
 }
