@@ -22,9 +22,7 @@ AI 寫得很快；真正讓人崩潰的，往往不是它完全做錯，而是�
 
 ![AI 釐清 A＋B API 需求的對話：先確認技術棧與資料型別，再追問呼叫方式、回傳格式與功能邊界](./docs/assets/readme/spec-clarification.gif)
 
-*這段對話只示範需求如何被問清楚；畫面中的選擇不代表目前專案功能或契約。*
-
-目前三個可執行範例共同遵循的契約，見[整數加法 API Spec 的驗收條件](specs/addition-api.md#驗收條件)。
+產出的 Spec：[整數加法 API](specs/addition-api.md)
 
 <details>
 <summary>停下來看兩輪追問</summary>
