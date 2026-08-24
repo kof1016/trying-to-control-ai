@@ -28,7 +28,7 @@ class AdditionApiTests {
 	}
 
 	@Test
-	void addsArbitrarilyLargeSignedIntegersAndReturnsCanonicalResult() throws Exception {
+	void addsSignedIntegersBeyondMachineRangeAndReturnsCanonicalResult() throws Exception {
 		mockMvc.perform(get("/add").param("a", "+0009223372036854775808").param("b", "-9223372036854775807"))
 				.andExpect(status().isOk()).andExpect(content().json("{\"result\":\"1\"}"));
 	}
@@ -37,6 +37,25 @@ class AdditionApiTests {
 	void returnsCanonicalZero() throws Exception {
 		mockMvc.perform(get("/add").param("a", "+0001").param("b", "-0001")).andExpect(status().isOk())
 				.andExpect(content().json("{\"result\":\"0\"}"));
+	}
+
+	@Test
+	void acceptsOneThousandDigitsAndReturnsExactOneThousandOneDigitResult() throws Exception {
+		String thousandDigitOperand = "+" + "9".repeat(1_000);
+		String expectedResult = "1" + "0".repeat(1_000);
+
+		mockMvc.perform(get("/add").param("a", thousandDigitOperand).param("b", "1")).andExpect(status().isOk())
+				.andExpect(content().json("{\"result\":\"" + expectedResult + "\"}"));
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = {"a", "b"})
+	void rejectsOperandsWhoseDigitPartExceedsOneThousandDigits(String parameterName) throws Exception {
+		String overlongValue = "-" + "0".repeat(1_001);
+		String a = parameterName.equals("a") ? overlongValue : "1";
+		String b = parameterName.equals("b") ? overlongValue : "1";
+
+		mockMvc.perform(get("/add").param("a", a).param("b", b)).andExpect(status().isBadRequest());
 	}
 
 	@ParameterizedTest
