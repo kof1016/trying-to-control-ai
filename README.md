@@ -24,6 +24,8 @@ AI 寫得很快；真正讓人崩潰的，往往不是它完全做錯，而是�
 
 *這段對話只示範需求如何被問清楚；畫面中的選擇不代表目前專案功能或契約。*
 
+目前三個可執行範例共同遵循的契約，見[整數加法 API Spec 的驗收條件](specs/addition-api.md#驗收條件)。
+
 <details>
 <summary>停下來看兩輪追問</summary>
 
@@ -107,8 +109,7 @@ flowchart TB
 把自然語言需求交給支援 Repository 規則與 Skills 的 coding Agent：
 
 ```text
-請先讀取 AGENTS.md 與 CONVERSATION_RULES.md，
-依 Repository 規則完成以下需求：
+請依 Repository 規則完成以下需求：
 
 <用自然語言描述需求>
 ```
@@ -158,7 +159,7 @@ flowchart TB
 {"result":"3"}
 ```
 
-完整輸入格式、任意大小整數與錯誤行為見 [`specs/addition-api.md`](specs/addition-api.md)。各範例的完整驗證命令如下。
+完整輸入格式、任意大小整數與錯誤行為由上述 Spec 定義。各範例的完整驗證命令如下。
 
 Spring Boot（Java 25）：
 
