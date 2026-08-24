@@ -8,15 +8,36 @@ AI 寫得很快；真正讓人不安的，往往不是它完全做錯，而是�
 - 順手增加功能，或為想像中的擴充性多做幾層架構。
 - 程式能跑、測試也通過，人卻還是不確定這是不是自己真正要的。
 
-這個 Demo 把 AI 的推理能力用在更前面：先一起把需求、功能邊界與驗收方式說清楚，確認 Spec，再依同一份內容完成實作、測試、Review 與交付。
+這個 Demo 把 AI 的推理能力放在更前面：先一起把需求、功能邊界與驗收方式說清楚，再讓同一份 Spec 帶著後續工作往下走。
 
 流程規則與 Skills 直接放在 Repository 裡，由 AI 根據目前結果判斷下一步；不需要另外撰寫一個外部流程程式，把每一步硬編碼起來。
 
 信任不是要 AI 保證不犯錯，而是讓影響產品的決定與最後如何驗收，都能被看見。
 
+## 從一句「做一個 A＋B API」開始
+
+看起來只是一個加法，真正開始問，才發現呼叫方式、資料範圍、回傳格式與功能邊界都還沒決定。這段展示的不是 A＋B 怎麼寫，而是 AI 如何跟你一起把規格說清楚。
+
+![AI 釐清 A＋B API 需求的對話：先確認技術棧與資料型別，再追問呼叫方式、回傳格式與功能邊界](./docs/assets/readme/spec-clarification.gif)
+
+*這段對話只示範需求如何被問清楚；畫面中的選擇不代表目前專案功能或契約。*
+
+<details>
+<summary>停下來看兩輪追問</summary>
+
+**第一輪：從技術棧與資料型別，問到呼叫方式、回傳格式與整數範圍。**
+
+[![第一輪需求追問：AI 提出呼叫方式、回傳格式與整數範圍的問題和建議](./docs/assets/readme/spec-clarification-step-1.png)](./docs/assets/readme/spec-clarification-step-1.png)
+
+**第二輪：根據前一輪的選擇，繼續確認請求格式與存取控制。**
+
+[![第二輪需求追問：AI 根據使用者的選擇，繼續確認 POST 請求格式與存取控制](./docs/assets/readme/spec-clarification-step-2.png)](./docs/assets/readme/spec-clarification-step-2.png)
+
+</details>
+
 ## 這套流程怎麼運作
 
-需求不是問一次就結束。使用者與 AI 會持續釐清問題、確認取捨，直到共同確認 Spec，再把它帶進後續工作。
+前面的追問會收斂成 Spec，成為後續實作、測試與 Review 的共同依據。
 
 ```mermaid
 %%{init: {
@@ -111,6 +132,8 @@ flowchart TB
 │   ├── pull_request_template.md    交付與 Review 紀錄格式
 │   └── workflows/
 │       └── spring-boot.yml         示範專案的 GitHub Actions CI
+├── docs/
+│   └── assets/readme/              README 示範圖
 ├── examples/
 │   └── spring-boot/                可執行的示範專案，可替換技術棧
 ├── AGENTS.md                       工作流與交付規則
