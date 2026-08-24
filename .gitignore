@@ -2,6 +2,8 @@ target/
 node_modules/
 dist/
 coverage/
+bin/
+obj/
 
 # Go build and test output
 *.exe
